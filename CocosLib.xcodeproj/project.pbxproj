@@ -54,7 +54,6 @@
 		E6AA4DD113B1574400C9F08C /* b2WeldJoint.h in Headers */ = {isa = PBXBuildFile; fileRef = E6AA4C3F13B1574400C9F08C /* b2WeldJoint.h */; };
 		E6AA4DD213B1574400C9F08C /* b2WheelJoint.h in Headers */ = {isa = PBXBuildFile; fileRef = E6AA4C4013B1574400C9F08C /* b2WheelJoint.h */; };
 		E6AA4DD313B1574400C9F08C /* b2Rope.h in Headers */ = {isa = PBXBuildFile; fileRef = E6AA4C4213B1574400C9F08C /* b2Rope.h */; };
-		E6AA4DD413B1574400C9F08C /* CCSpriteExtensions.h in Headers */ = {isa = PBXBuildFile; fileRef = E6AA4C4313B1574400C9F08C /* CCSpriteExtensions.h */; };
 		E6AA4DD513B1574400C9F08C /* CCAction.h in Headers */ = {isa = PBXBuildFile; fileRef = E6AA4C4513B1574400C9F08C /* CCAction.h */; };
 		E6AA4DD613B1574400C9F08C /* CCActionCamera.h in Headers */ = {isa = PBXBuildFile; fileRef = E6AA4C4613B1574400C9F08C /* CCActionCamera.h */; };
 		E6AA4DD713B1574400C9F08C /* CCActionEase.h in Headers */ = {isa = PBXBuildFile; fileRef = E6AA4C4713B1574400C9F08C /* CCActionEase.h */; };
@@ -231,7 +230,6 @@
 		E6AA4E8213B1574400C9F08C /* b2WeldJoint.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E6AA4D0813B1574400C9F08C /* b2WeldJoint.cpp */; };
 		E6AA4E8313B1574400C9F08C /* b2WheelJoint.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E6AA4D0913B1574400C9F08C /* b2WheelJoint.cpp */; };
 		E6AA4E8413B1574400C9F08C /* b2Rope.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E6AA4D0B13B1574400C9F08C /* b2Rope.cpp */; };
-		E6AA4E8513B1574400C9F08C /* CCSpriteExtension.m in Sources */ = {isa = PBXBuildFile; fileRef = E6AA4D0C13B1574400C9F08C /* CCSpriteExtension.m */; };
 		E6AA4E8613B1574400C9F08C /* CCAction.m in Sources */ = {isa = PBXBuildFile; fileRef = E6AA4D0E13B1574400C9F08C /* CCAction.m */; };
 		E6AA4E8713B1574400C9F08C /* CCActionCamera.m in Sources */ = {isa = PBXBuildFile; fileRef = E6AA4D0F13B1574400C9F08C /* CCActionCamera.m */; };
 		E6AA4E8813B1574400C9F08C /* CCActionEase.m in Sources */ = {isa = PBXBuildFile; fileRef = E6AA4D1013B1574400C9F08C /* CCActionEase.m */; };
@@ -422,7 +420,6 @@
 		E6AA4C3F13B1574400C9F08C /* b2WeldJoint.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = b2WeldJoint.h; sourceTree = "<group>"; };
 		E6AA4C4013B1574400C9F08C /* b2WheelJoint.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = b2WheelJoint.h; sourceTree = "<group>"; };
 		E6AA4C4213B1574400C9F08C /* b2Rope.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = b2Rope.h; sourceTree = "<group>"; };
-		E6AA4C4313B1574400C9F08C /* CCSpriteExtensions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CCSpriteExtensions.h; sourceTree = "<group>"; };
 		E6AA4C4513B1574400C9F08C /* CCAction.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CCAction.h; sourceTree = "<group>"; };
 		E6AA4C4613B1574400C9F08C /* CCActionCamera.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CCActionCamera.h; sourceTree = "<group>"; };
 		E6AA4C4713B1574400C9F08C /* CCActionEase.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CCActionEase.h; sourceTree = "<group>"; };
@@ -599,7 +596,6 @@
 		E6AA4D0813B1574400C9F08C /* b2WeldJoint.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = b2WeldJoint.cpp; sourceTree = "<group>"; };
 		E6AA4D0913B1574400C9F08C /* b2WheelJoint.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = b2WheelJoint.cpp; sourceTree = "<group>"; };
 		E6AA4D0B13B1574400C9F08C /* b2Rope.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = b2Rope.cpp; sourceTree = "<group>"; };
-		E6AA4D0C13B1574400C9F08C /* CCSpriteExtension.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CCSpriteExtension.m; sourceTree = "<group>"; };
 		E6AA4D0E13B1574400C9F08C /* CCAction.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CCAction.m; sourceTree = "<group>"; };
 		E6AA4D0F13B1574400C9F08C /* CCActionCamera.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CCActionCamera.m; sourceTree = "<group>"; };
 		E6AA4D1013B1574400C9F08C /* CCActionEase.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CCActionEase.m; sourceTree = "<group>"; };
@@ -737,7 +733,7 @@
 		E6AA4DA313B1574400C9F08C /* LICENSE.box2d */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = LICENSE.box2d; sourceTree = "<group>"; };
 		E6AA4DA413B1574400C9F08C /* LICENSE.cocos2d */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = LICENSE.cocos2d; sourceTree = "<group>"; };
 		E6AA4DA513B1574400C9F08C /* LICENSE.cocosdenshion */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = LICENSE.cocosdenshion; sourceTree = "<group>"; };
-		E6DDF2FC12D8F8ED009031A5 /* libCocosLib_script.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libCocosLib_script.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		E6E142C913B3EC990052ED3D /* libCocosLib_script.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libCocosLib_script.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		E6E2A63212CE48E000923828 /* libCocos.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libCocos.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		E6E2A63612CE492600923828 /* AVFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFoundation.framework; path = System/Library/Frameworks/AVFoundation.framework; sourceTree = SDKROOT; };
 		E6E2A63812CE492600923828 /* CoreFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreFoundation.framework; path = System/Library/Frameworks/CoreFoundation.framework; sourceTree = SDKROOT; };
@@ -776,7 +772,7 @@
 			isa = PBXGroup;
 			children = (
 				E6E2A63212CE48E000923828 /* libCocos.a */,
-				E6DDF2FC12D8F8ED009031A5 /* libCocosLib_script.a */,
+				E6E142C913B3EC990052ED3D /* libCocosLib_script.a */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -814,7 +810,6 @@
 			isa = PBXGroup;
 			children = (
 				E6AA4C0D13B1574400C9F08C /* Box2D */,
-				E6AA4C4313B1574400C9F08C /* CCSpriteExtensions.h */,
 				E6AA4C4413B1574400C9F08C /* cocos2d */,
 				E6AA4CA113B1574400C9F08C /* CocosDenshion */,
 				E6AA4CAB13B1574400C9F08C /* cocoslive */,
@@ -1183,7 +1178,6 @@
 			isa = PBXGroup;
 			children = (
 				E6AA4CD713B1574400C9F08C /* Box2D */,
-				E6AA4D0C13B1574400C9F08C /* CCSpriteExtension.m */,
 				E6AA4D0D13B1574400C9F08C /* cocos2d */,
 				E6AA4D5E13B1574400C9F08C /* CocosDenshion */,
 				E6AA4D6713B1574400C9F08C /* cocoslive */,
@@ -1614,7 +1608,6 @@
 				E6AA4DD113B1574400C9F08C /* b2WeldJoint.h in Headers */,
 				E6AA4DD213B1574400C9F08C /* b2WheelJoint.h in Headers */,
 				E6AA4DD313B1574400C9F08C /* b2Rope.h in Headers */,
-				E6AA4DD413B1574400C9F08C /* CCSpriteExtensions.h in Headers */,
 				E6AA4DD513B1574400C9F08C /* CCAction.h in Headers */,
 				E6AA4DD613B1574400C9F08C /* CCActionCamera.h in Headers */,
 				E6AA4DD713B1574400C9F08C /* CCActionEase.h in Headers */,
@@ -1765,7 +1758,7 @@
 			);
 			name = CocosLib_script;
 			productName = CocosLib_script;
-			productReference = E6DDF2FC12D8F8ED009031A5 /* libCocosLib_script.a */;
+			productReference = E6E142C913B3EC990052ED3D /* libCocosLib_script.a */;
 			productType = "com.apple.product-type.library.static";
 		};
 		E6E2A63112CE48E000923828 /* Cocos */ = {
@@ -1880,7 +1873,6 @@
 				E6AA4E8213B1574400C9F08C /* b2WeldJoint.cpp in Sources */,
 				E6AA4E8313B1574400C9F08C /* b2WheelJoint.cpp in Sources */,
 				E6AA4E8413B1574400C9F08C /* b2Rope.cpp in Sources */,
-				E6AA4E8513B1574400C9F08C /* CCSpriteExtension.m in Sources */,
 				E6AA4E8613B1574400C9F08C /* CCAction.m in Sources */,
 				E6AA4E8713B1574400C9F08C /* CCActionCamera.m in Sources */,
 				E6AA4E8813B1574400C9F08C /* CCActionEase.m in Sources */,

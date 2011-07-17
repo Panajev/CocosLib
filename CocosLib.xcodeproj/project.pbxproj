@@ -71,7 +71,6 @@
 		E610705613CA2E5600FA7676 /* b2Settings.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E610702313CA2E5600FA7676 /* b2Settings.cpp */; };
 		E610705713CA2E5600FA7676 /* b2StackAllocator.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E610702413CA2E5600FA7676 /* b2StackAllocator.cpp */; };
 		E610705813CA2E5600FA7676 /* b2Timer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E610702513CA2E5600FA7676 /* b2Timer.cpp */; };
-		E610705913CA2E5600FA7676 /* libBox2D.a in Frameworks */ = {isa = PBXBuildFile; fileRef = E610702713CA2E5600FA7676 /* libBox2D.a */; };
 		E610705A13CA2E5600FA7676 /* b2Body.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E610702913CA2E5600FA7676 /* b2Body.cpp */; };
 		E610705B13CA2E5600FA7676 /* b2ContactManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E610702A13CA2E5600FA7676 /* b2ContactManager.cpp */; };
 		E610705C13CA2E5600FA7676 /* b2Fixture.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E610702B13CA2E5600FA7676 /* b2Fixture.cpp */; };
@@ -436,7 +435,6 @@
 		E610702313CA2E5600FA7676 /* b2Settings.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = b2Settings.cpp; sourceTree = "<group>"; };
 		E610702413CA2E5600FA7676 /* b2StackAllocator.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = b2StackAllocator.cpp; sourceTree = "<group>"; };
 		E610702513CA2E5600FA7676 /* b2Timer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = b2Timer.cpp; sourceTree = "<group>"; };
-		E610702713CA2E5600FA7676 /* libBox2D.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libBox2D.a; sourceTree = "<group>"; };
 		E610702913CA2E5600FA7676 /* b2Body.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = b2Body.cpp; sourceTree = "<group>"; };
 		E610702A13CA2E5600FA7676 /* b2ContactManager.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = b2ContactManager.cpp; sourceTree = "<group>"; };
 		E610702B13CA2E5600FA7676 /* b2Fixture.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = b2Fixture.cpp; sourceTree = "<group>"; };
@@ -764,7 +762,6 @@
 				E6E2A63E12CE492600923828 /* Foundation.framework in Frameworks */,
 				E6E2A64012CE492600923828 /* OpenGLES.framework in Frameworks */,
 				E6E2A64212CE492600923828 /* libz.dylib in Frameworks */,
-				E610705913CA2E5600FA7676 /* libBox2D.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -815,7 +812,6 @@
 				E6106FAC13CA2E3A00FA7676 /* Box2D.h */,
 				E6106FAD13CA2E3A00FA7676 /* Collision */,
 				E6106FB913CA2E3A00FA7676 /* Common */,
-				E6106FC113CA2E3A00FA7676 /* Debug */,
 				E6106FC213CA2E3A00FA7676 /* Dynamics */,
 				E6106FE013CA2E3A00FA7676 /* Rope */,
 			);
@@ -859,13 +855,6 @@
 				E6106FC013CA2E3A00FA7676 /* b2Timer.h */,
 			);
 			path = Common;
-			sourceTree = "<group>";
-		};
-		E6106FC113CA2E3A00FA7676 /* Debug */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			path = Debug;
 			sourceTree = "<group>";
 		};
 		E6106FC213CA2E3A00FA7676 /* Dynamics */ = {
@@ -931,7 +920,6 @@
 			children = (
 				E610701113CA2E5600FA7676 /* Collision */,
 				E610701F13CA2E5600FA7676 /* Common */,
-				E610702613CA2E5600FA7676 /* Debug */,
 				E610702813CA2E5600FA7676 /* Dynamics */,
 				E610704513CA2E5600FA7676 /* Rope */,
 			);
@@ -976,14 +964,6 @@
 				E610702513CA2E5600FA7676 /* b2Timer.cpp */,
 			);
 			path = Common;
-			sourceTree = "<group>";
-		};
-		E610702613CA2E5600FA7676 /* Debug */ = {
-			isa = PBXGroup;
-			children = (
-				E610702713CA2E5600FA7676 /* libBox2D.a */,
-			);
-			path = Debug;
 			sourceTree = "<group>";
 		};
 		E610702813CA2E5600FA7676 /* Dynamics */ = {

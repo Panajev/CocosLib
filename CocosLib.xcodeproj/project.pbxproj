@@ -1819,7 +1819,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "#!/bin/sh\n\nTARGET=\"Cocos\"\n#undefine the following line if you want to move and properly unpack the .zip files into the destination folder specified with DEST_DIR\n#SCRIPT_OPTIONS=\"MOVE_FILE\"\nDEST_DIR=\"../SharedLibs\"\n\nSVN_REVISION=$(svn info | grep Revision | cut -d ' ' -f 2)\nif [ ! -z $SVN_REVISION ]; then\nLIB_VERSION=\"-rev$SVN_REVISION\"\nelse\nLIB_VERSION=\"-unversioned\"\nfi\nLIBRARY_NAME=\"lib${TARGET}.a\"\nLIBRARY_OUT_NAME_RELATIVE=\"lib${TARGET}${LIB_VERSION}.a\"\nLIBRARY_OUT_NAME=\"lib/$LIBRARY_OUT_NAME_RELATIVE\"\nLIBRARY_ARCHIVE=\"${TARGET}${LIB_VERSION}-${BUILD_STYLE}.zip\"\nFOLDER_NAME_IN=\"${TARGET}${LIB_VERSION}-${BUILD_STYLE}\"\nLATEST_SDK_DEVICE=$(xcodebuild -showsdks | grep iphoneos | awk 'BEGIN{FS=\"\\t\";}{print $3}' | cut -d ' ' -f 2 | tail -n 1)\nLATEST_SDK_SIMULATOR=$(xcodebuild -showsdks | grep iphonesimulator | awk 'BEGIN{FS=\"\\t\";}{print $3}' | cut -d ' ' -f 2 | tail -n 1)\n\necho\necho Building library, SVN revision $LIB_VERSION\necho\n\n# remove existing output file\nrm -rf ${PROJECT_DIR}/lib\nmkdir -p ${PROJECT_DIR}/lib\nrm -f \"${PROJECT_DIR}/$LIBRARY_ARCHIVE\"\n\n\n# Build library for simulator\nxcodebuild clean -target \"$TARGET\" -configuration \"${BUILD_STYLE}\" -sdk \"$LATEST_SDK_SIMULATOR\"\nxcodebuild build -target \"$TARGET\" -configuration \"${BUILD_STYLE}\" -sdk \"$LATEST_SDK_SIMULATOR\"\n\necho print \necho ${BUILD_STYLE}\n\n# Build library for device\nxcodebuild clean -target \"$TARGET\" -configuration \"${BUILD_STYLE}\" -sdk \"$LATEST_SDK_DEVICE\"\nxcodebuild build -target \"$TARGET\" -configuration \"${BUILD_STYLE}\" -sdk \"$LATEST_SDK_DEVICE\"\n\necho \"${PROJECT_DIR}/build\"\necho \"${PROJECT_DIR}/build/${BUILD_STYLE}-iphonesimulator/$LIBRARY_NAME\"\necho \"${PROJECT_DIR}BUI/$LIBRARY_OUT_NAME\"\n\n# Glue together libraries\nlipo \"${PROJECT_DIR}/build/${BUILD_STYLE}-iphoneos/$LIBRARY_NAME\" -arch i386 \"${PROJECT_DIR}/build/${BUILD_STYLE}-iphonesimulator/$LIBRARY_NAME\" -create -output \"${PROJECT_DIR}/$LIBRARY_OUT_NAME\"\n\n# Create symlink\ncd lib\nln -s \"$LIBRARY_OUT_NAME_RELATIVE\" \"$LIBRARY_NAME\"\ncd ..\n\nif [ $? -eq 0 ]; then\nzip -R -y \"${PROJECT_DIR}/$LIBRARY_ARCHIVE\" \"lib/*.a\" -x@zip_exclude.lst\nzip -r -y \"${PROJECT_DIR}/$LIBRARY_ARCHIVE\" \"include\" -x@zip_exclude.lst\nzip -r -y \"${PROJECT_DIR}/$LIBRARY_ARCHIVE\" \"resources\" -x@zip_exclude.lst\nfi\n\nif [ \"Debug\" == ${BUILD_STYLE} ]; then\nFOLDER_NAME_OUT=\"$TARGET-${BUILD_STYLE}\"\nelse\nFOLDER_NAME_OUT=$TARGET\nfi\n\nif [ \"MOVE_FILE\" = $SCRIPT_OPTIONS ]; then\nrm -f $DEST_DIR/\"$LIBRARY_ARCHIVE\"\ncp \"${PROJECT_DIR}/$LIBRARY_ARCHIVE\" \"$DEST_DIR\"/.\nrm -rf \"$DEST_DIR/$FOLDER_NAME_OUT/*.a\"\nrm -rf \"$DEST_DIR/$FOLDER_NAME_OUT/*.h\"\n#rm -rf \"$DEST_DIR/$FOLDER_NAME_OUT/*.bundle\"\n#mkdir \"$DEST_DIR/$FOLDER_NAME_OUT\"\nunzip -o \"$DEST_DIR/$FOLDER_NAME_IN\" -d $DEST_DIR/\"$FOLDER_NAME_OUT\"/\nrm -f \"$DEST_DIR/\"$LIBRARY_ARCHIVE\nfi\n";
+			shellScript = "#!/bin/sh\n\nTARGET=\"Cocos\"\n#undefine the following line if you want to move and properly unpack the .zip files into the destination folder specified with DEST_DIR\n#SCRIPT_OPTIONS=\"MOVE_FILE\"\nDEST_DIR=\"../SharedLibs\"\n\n#SVN_REVISION=$(svn info | grep Revision | cut -d ' ' -f 2)\nif [ ! -z $SVN_REVISION ]; then\n    LIB_VERSION=\"-rev$SVN_REVISION\"\nelse\n    LIB_VERSION=\"-unversioned\"\nfi\n\nLIBRARY_NAME=\"lib$TARGET.a\"\nLIBRARY_OUT_NAME_RELATIVE=\"lib$TARGET${LIB_VERSION}.a\"\nLIBRARY_OUT_NAME=\"lib/$LIBRARY_OUT_NAME_RELATIVE\"\nLATEST_SDK_DEVICE=$(xcodebuild -showsdks | grep iphoneos | awk 'BEGIN{FS=\"\\t\";}{print $3}' | cut -d ' ' -f 2 | tail -n 1)\nLATEST_SDK_SIMULATOR=$(xcodebuild -showsdks | grep iphonesimulator | awk 'BEGIN{FS=\"\\t\";}{print $3}' | cut -d ' ' -f 2 | tail -n 1)\n\nlocal_build_root=\"${PROJECT_DIR}/build\"\nbuild_styles=\"Debug Release\"\n\nfor current_style in $build_styles; do\nLIBRARY_ARCHIVE=\"$TARGET${LIB_VERSION}-${current_style}.zip\"\n\nif [ $current_style = \"Debug\" ]; then\n    othercflags=\"OTHER_CFLAGS=$(value)\";\nelse  \n    othercflags=\"OTHER_CFLAGS=$(value) \\\"-DRELEASE_VERSION\\\"\";\nfi\n\n# remove existing output file\nrm -rf ${PROJECT_DIR}/lib\nmkdir -p ${PROJECT_DIR}/lib\n\n# Build library for simulator\nxcodebuild clean -target $TARGET -configuration $current_style -sdk $LATEST_SDK_SIMULATOR\nxcodebuild -target $TARGET -configuration $current_style -sdk $LATEST_SDK_SIMULATOR \"$othercflags\" build\n\n# Build library for device\nxcodebuild clean -target $TARGET -configuration $current_style -sdk $LATEST_SDK_DEVICE\nxcodebuild -target $TARGET -configuration $current_style -sdk $LATEST_SDK_DEVICE \"$othercflags\" build\n\n# Glue together libraries\nlipo \"${local_build_root}/${current_style}-iphoneos/$LIBRARY_NAME\" -arch i386 \"${local_build_root}/${current_style}-iphonesimulator/$LIBRARY_NAME\" -create -output \"${PROJECT_DIR}/$LIBRARY_OUT_NAME\"\n\n# Create symlink\ncd lib\ncp \"$LIBRARY_OUT_NAME_RELATIVE\" \"$LIBRARY_NAME\"\nrm \"$LIBRARY_OUT_NAME_RELATIVE\"\nln -s \"$LIBRARY_NAME\" \"$LIBRARY_OUT_NAME_RELATIVE\"\ncd ..\n\nif [ $? -eq 0 ]; then\n    zip -R -y \"${PROJECT_DIR}/$LIBRARY_ARCHIVE\" \"lib/*.a\"\n    zip -r -y \"${PROJECT_DIR}/$LIBRARY_ARCHIVE\" \"resources\" \"include\" -x@zip_exclude.lst\n#zip \"${PROJECT_DIR}/$LIBRARY_ARCHIVE\" .packageid\nfi\ndone\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
@@ -2015,7 +2015,7 @@
 				ARCHS = "$(ARCHS_UNIVERSAL_IPHONE_OS)";
 				GCC_C_LANGUAGE_STANDARD = c99;
 				GCC_OPTIMIZATION_LEVEL = 3;
-				GCC_VERSION = com.apple.compilers.llvmgcc42;
+				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				GCC_WARN_ABOUT_MISSING_PROTOTYPES = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
@@ -2100,7 +2100,7 @@
 			buildSettings = {
 				COPY_PHASE_STRIP = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
-				GCC_VERSION = "";
+				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					../SharedLibs/Utilities/lib,
@@ -2119,7 +2119,7 @@
 				COPY_PHASE_STRIP = NO;
 				GCC_C_LANGUAGE_STANDARD = c99;
 				GCC_DEBUGGING_SYMBOLS = full;
-				GCC_VERSION = com.apple.compilers.llvmgcc42;
+				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				GCC_WARN_ABOUT_MISSING_PROTOTYPES = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
@@ -2178,7 +2178,7 @@
 			buildSettings = {
 				COPY_PHASE_STRIP = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
-				GCC_VERSION = "";
+				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"../SharedLibs/Utilities-Debug/lib",

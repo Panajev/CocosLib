@@ -115,6 +115,7 @@
 	
 	CGSize texSize = [texture_ contentSizeInPixels];
 	
+	
 	// Calculate the adjustment ratios based on the old and new projections
 	CGSize size = [[CCDirector sharedDirector] displaySizeInPixels];
 	float widthRatio = size.width / texSize.width;
@@ -138,29 +139,6 @@
 	// 
 	// If you understand the above mentioned message, then you can comment the following line
 	// and enable the gl states manually, in case you need them.
-	CC_ENABLE_DEFAULT_GL_STATES();
-}
-
--(void)begin_new
-{    
-	CC_DISABLE_DEFAULT_GL_STATES();
-	// Save the current matrix
-	glPushMatrix();
-    
-    //	CGSize texSize = [texture_ contentSizeInPixels];
-    //
-    //	// Calculate the adjustment ratios based on the old and new projections
-    //	CGSize size = [[CCDirector sharedDirector] displaySizeInPixels];
-    //	float widthRatio = size.width / texSize.width;
-    //	float heightRatio = size.height / texSize.height;
-    //
-	// Adjust the orthographic propjection and viewport
-    //	ccglOrtho((float)-1.0 / widthRatio,  (float)1.0 / widthRatio, (float)-1.0 / heightRatio, (float)1.0 / heightRatio, -1,1);
-    //	glViewport(0, 0, texSize.width, texSize.height);
-    
-	glGetIntegerv(CC_GL_FRAMEBUFFER_BINDING, &oldFBO_);
-	ccglBindFramebuffer(CC_GL_FRAMEBUFFER, fbo_);//Will direct drawing to the frame buffer created above
-    
 	CC_ENABLE_DEFAULT_GL_STATES();
 }
 

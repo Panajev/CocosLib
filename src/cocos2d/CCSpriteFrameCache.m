@@ -196,7 +196,7 @@ static CCSpriteFrameCache *sharedSpriteFrameCache_=nil;
 	NSString *path = [CCFileUtils fullPathFromRelativePath:plist];
 	NSDictionary *dict = [NSDictionary dictionaryWithContentsOfFile:path];
 
-	return [self addSpriteFramesWithDictionary:dict texture:texture];
+	[self addSpriteFramesWithDictionary:dict texture:texture];
 }
 
 -(void) addSpriteFramesWithFile:(NSString*)plist textureFile:(NSString*)textureFileName
@@ -337,11 +337,4 @@ static CCSpriteFrameCache *sharedSpriteFrameCache_=nil;
 	return frame;
 }
 
-#pragma mark CCSpriteFrameCache - sprite creation
-
--(CCSprite*) createSpriteWithFrameName:(NSString*)name
-{
-	CCSpriteFrame *frame = [spriteFrames_ objectForKey:name];
-	return [CCSprite spriteWithSpriteFrame:frame];
-}
 @end

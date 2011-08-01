@@ -106,6 +106,8 @@ struct transformValues_ {
 +(id)spriteWithSpriteFrameName:(NSString*)spriteFrameName
 {
 	CCSpriteFrame *frame = [[CCSpriteFrameCache sharedSpriteFrameCache] spriteFrameByName:spriteFrameName];
+	
+	NSAssert1(frame!=nil, @"Invalid spriteFrameName: %@", spriteFrameName);
 	return [self spriteWithSpriteFrame:frame];
 }
 
@@ -142,9 +144,6 @@ struct transformValues_ {
 		bzero(&quad_, sizeof(quad_));
 		
 		flipY_ = flipX_ = NO;
-		
-		// lazy alloc
-		animations_ = nil;
 		
 		// default transform anchor: center
 		anchorPoint_ =  ccp(0.5f, 0.5f);
@@ -241,21 +240,6 @@ struct transformValues_ {
 	return [self initWithSpriteFrame:frame];
 }
 
-// XXX: deprecated
-- (id) initWithCGImage: (CGImageRef)image
-{
-	NSAssert(image!=nil, @"Invalid CGImageRef for sprite");
-
-	// XXX: possible bug. See issue #349. New API should be added
-	NSString *key = [NSString stringWithFormat:@"%08X",(unsigned long)image];
-	CCTexture2D *texture = [[CCTextureCache sharedTextureCache] addCGImage:image forKey:key];
-	
-	CGRect rect = CGRectZero;
-	rect.size = texture.contentSize;
-	
-	return [self initWithTexture:texture rect:rect];
-}
-
 - (id) initWithCGImage:(CGImageRef)image key:(NSString*)key
 {
 	NSAssert(image!=nil, @"Invalid CGImageRef for sprite");
@@ -298,7 +282,6 @@ struct transformValues_ {
 - (void) dealloc
 {
 	[texture_ release];
-	[animations_ release];
 	[super dealloc];
 }
 
@@ -325,11 +308,6 @@ struct transformValues_ {
 	usesBatchNode_ = YES;
 	textureAtlas_ = [batchNode textureAtlas]; // weak ref
 	batchNode_ = batchNode; // weak ref
-}
-
--(void) initAnimationDictionary
-{
-	animations_ = [[NSMutableDictionary alloc] initWithCapacity:2];
 }
 
 -(void)setTextureRect:(CGRect)rect
@@ -593,6 +571,8 @@ struct transformValues_ {
 
 -(void) draw
 {
+	[super draw];
+
 	NSAssert(!usesBatchNode_, @"If CCSprite is being rendered by CCSpriteBatchNode, CCSprite#draw SHOULD NOT be called");
 
 	// Default GL states: GL_TEXTURE_2D, GL_VERTEX_ARRAY, GL_COLOR_ARRAY, GL_TEXTURE_COORD_ARRAY
@@ -625,14 +605,24 @@ struct transformValues_ {
 	if( newBlend )
 		glBlendFunc(CC_BLEND_SRC, CC_BLEND_DST);
 	
-#if CC_SPRITE_DEBUG_DRAW
-	CGSize s = [self contentSize];
-	CGPoint vertices[4]={
-		ccp(0,0),ccp(s.width,0),
-		ccp(s.width,s.height),ccp(0,s.height),
+#if CC_SPRITE_DEBUG_DRAW == 1
+	// draw bounding box
+	CGSize s = self.contentSize;
+	CGPoint vertices[4] = {
+		ccp(0,0), ccp(s.width,0),
+		ccp(s.width,s.height), ccp(0,s.height)
 	};
 	ccDrawPoly(vertices, 4, YES);
-#endif // CC_TEXTURENODE_DEBUG_DRAW
+#elif CC_SPRITE_DEBUG_DRAW == 2
+	// draw texture box
+	CGSize s = self.textureRect.size;
+	CGPoint offsetPix = self.offsetPositionInPixels;
+	CGPoint vertices[4] = {
+		ccp(offsetPix.x,offsetPix.y), ccp(offsetPix.x+s.width,offsetPix.y),
+		ccp(offsetPix.x+s.width,offsetPix.y+s.height), ccp(offsetPix.x,offsetPix.y+s.height)
+	};
+	ccDrawPoly(vertices, 4, YES);
+#endif // CC_SPRITE_DEBUG_DRAW
 	
 }
 
@@ -915,20 +905,6 @@ struct transformValues_ {
 	[self setTextureRectInPixels:frame.rectInPixels rotated:frame.rotated untrimmedSize:frame.originalSizeInPixels];
 }
 
-// XXX deprecated
--(void) setDisplayFrame: (NSString*) animationName index:(int) frameIndex
-{
-	if( ! animations_ )
-		[self initAnimationDictionary];
-	
-	CCAnimation *a = [animations_ objectForKey: animationName];
-	CCSpriteFrame *frame = [[a frames] objectAtIndex:frameIndex];
-	
-	NSAssert( frame, @"CCSprite#setDisplayFrame. Invalid frame");
-	
-	[self setDisplayFrame:frame];
-}
-
 -(void) setDisplayFrameWithAnimationName: (NSString*) animationName index:(int) frameIndex
 {
 	NSAssert( animationName, @"CCSprite#setDisplayFrameWithAnimationName. animationName must not be nil");
@@ -959,21 +935,6 @@ struct transformValues_ {
 								   rotated:rectRotated_
 									offset:unflippedOffsetPositionFromCenter_
 							  originalSize:contentSizeInPixels_];
-}
-
--(void) addAnimation: (CCAnimation*) anim
-{
-	// lazy alloc
-	if( ! animations_ )
-		[self initAnimationDictionary];
-	
-	[animations_ setObject:anim forKey:[anim name]];
-}
-
--(CCAnimation*)animationByName: (NSString*) animationName
-{
-	NSAssert( animationName != nil, @"animationName parameter must be non nil");
-    return [animations_ objectForKey:animationName];
 }
 
 #pragma mark CCSprite - CocosNodeTexture protocol

@@ -134,11 +134,6 @@ static char * glExtensions;
 #elif defined(__MAC_OS_X_VERSION_MAX_ALLOWED)
 		supportsBGRA8888_ = [self checkForGLExtension:@"GL_EXT_bgra"];
 #endif
-        
-        if(!supportsNPOT_ && CC_TEXTURE_NPOT_SUPPORT) {
-            NSLog(@"NPOT textures should be supported...");
-            assert(0);
-        }
 		
 		supportsDiscardFramebuffer_ = [self checkForGLExtension:@"GL_EXT_discard_framebuffer"];
 

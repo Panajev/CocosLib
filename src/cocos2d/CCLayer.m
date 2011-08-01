@@ -355,6 +355,8 @@
 
 - (void)draw
 {		
+	[super draw];
+
 	// Default GL states: GL_TEXTURE_2D, GL_VERTEX_ARRAY, GL_COLOR_ARRAY, GL_TEXTURE_COORD_ARRAY
 	// Needed states: GL_VERTEX_ARRAY, GL_COLOR_ARRAY
 	// Unneeded states: GL_TEXTURE_2D, GL_TEXTURE_COORD_ARRAY
@@ -398,10 +400,6 @@
 	opacity_ = o;
 	[self updateColor];
 }
-@end
-
-// XXX Deprecated
-@implementation CCColorLayer
 @end
 
 
@@ -614,6 +612,3 @@
 }
 @end
 
-// XXX Deprecated
-@implementation CCMultiplexLayer
-@end

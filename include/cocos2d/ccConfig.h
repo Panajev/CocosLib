@@ -216,7 +216,7 @@
  @since v0.99.2
  */
 #ifndef CC_TEXTURE_NPOT_SUPPORT
-#define CC_TEXTURE_NPOT_SUPPORT 0
+#define CC_TEXTURE_NPOT_SUPPORT 1
 #endif
 
 /** @def CC_USE_LA88_LABELS_ON_NEON_ARCH
@@ -244,7 +244,7 @@
  2 -- draw texture box
  */
 #ifndef CC_SPRITE_DEBUG_DRAW
-#define CC_SPRITE_DEBUG_DRAW 0
+#define CC_SPRITE_DEBUG_DRAW DEBUG
 #endif
 
 /** @def CC_SPRITEBATCHNODE_DEBUG_DRAW
@@ -254,7 +254,7 @@
  To enable set it to a value different than 0. Disabled by default.
  */
 #ifndef CC_SPRITEBATCHNODE_DEBUG_DRAW
-#define CC_SPRITEBATCHNODE_DEBUG_DRAW 0
+#define CC_SPRITEBATCHNODE_DEBUG_DRAW DEBUG
 #endif
 
 /** @def CC_LABELBMFONT_DEBUG_DRAW
@@ -264,7 +264,7 @@
  To enable set it to a value different than 0. Disabled by default.
  */
 #ifndef CC_LABELBMFONT_DEBUG_DRAW
-#define CC_LABELBMFONT_DEBUG_DRAW 0
+#define CC_LABELBMFONT_DEBUG_DRAW DEBUG
 #endif
 
 /** @def CC_LABELBMFONT_DEBUG_DRAW
@@ -274,7 +274,7 @@
  To enable set it to a value different than 0. Disabled by default.
  */
 #ifndef CC_LABELATLAS_DEBUG_DRAW
-#define CC_LABELATLAS_DEBUG_DRAW 0
+#define CC_LABELATLAS_DEBUG_DRAW DEBUG
 #endif
 
 /** @def CC_ENABLE_PROFILERS
@@ -285,5 +285,5 @@
  To enable set it to a value different than 0. Disabled by default.
  */
 #ifndef CC_ENABLE_PROFILERS
-#define CC_ENABLE_PROFILERS 0
+#define CC_ENABLE_PROFILERS DEBUG
 #endif

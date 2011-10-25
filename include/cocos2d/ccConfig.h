@@ -244,7 +244,7 @@
  2 -- draw texture box
  */
 #ifndef CC_SPRITE_DEBUG_DRAW
-#define CC_SPRITE_DEBUG_DRAW DEBUG
+#define CC_SPRITE_DEBUG_DRAW 0
 #endif
 
 /** @def CC_SPRITEBATCHNODE_DEBUG_DRAW
@@ -254,7 +254,7 @@
  To enable set it to a value different than 0. Disabled by default.
  */
 #ifndef CC_SPRITEBATCHNODE_DEBUG_DRAW
-#define CC_SPRITEBATCHNODE_DEBUG_DRAW DEBUG
+#define CC_SPRITEBATCHNODE_DEBUG_DRAW 0
 #endif
 
 /** @def CC_LABELBMFONT_DEBUG_DRAW
@@ -264,7 +264,7 @@
  To enable set it to a value different than 0. Disabled by default.
  */
 #ifndef CC_LABELBMFONT_DEBUG_DRAW
-#define CC_LABELBMFONT_DEBUG_DRAW DEBUG
+#define CC_LABELBMFONT_DEBUG_DRAW 0
 #endif
 
 /** @def CC_LABELBMFONT_DEBUG_DRAW
@@ -274,7 +274,7 @@
  To enable set it to a value different than 0. Disabled by default.
  */
 #ifndef CC_LABELATLAS_DEBUG_DRAW
-#define CC_LABELATLAS_DEBUG_DRAW DEBUG
+#define CC_LABELATLAS_DEBUG_DRAW 0
 #endif
 
 /** @def CC_ENABLE_PROFILERS
@@ -285,5 +285,5 @@
  To enable set it to a value different than 0. Disabled by default.
  */
 #ifndef CC_ENABLE_PROFILERS
-#define CC_ENABLE_PROFILERS DEBUG
+#define CC_ENABLE_PROFILERS 0
 #endif

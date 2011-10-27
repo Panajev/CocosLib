@@ -241,7 +241,6 @@
 		E66ABC5D14540F9F009D9476 /* pngrtran.c in Sources */ = {isa = PBXBuildFile; fileRef = E66ABBCF14540F9F009D9476 /* pngrtran.c */; };
 		E66ABC5E14540F9F009D9476 /* pngrutil.c in Sources */ = {isa = PBXBuildFile; fileRef = E66ABBD014540F9F009D9476 /* pngrutil.c */; };
 		E66ABC5F14540F9F009D9476 /* pngset.c in Sources */ = {isa = PBXBuildFile; fileRef = E66ABBD114540F9F009D9476 /* pngset.c */; };
-		E66ABC6014540F9F009D9476 /* pngtest.c in Sources */ = {isa = PBXBuildFile; fileRef = E66ABBD214540F9F009D9476 /* pngtest.c */; };
 		E66ABC6114540F9F009D9476 /* pngtrans.c in Sources */ = {isa = PBXBuildFile; fileRef = E66ABBD414540F9F009D9476 /* pngtrans.c */; };
 		E66ABC6214540F9F009D9476 /* pngvcrd.c in Sources */ = {isa = PBXBuildFile; fileRef = E66ABBD514540F9F009D9476 /* pngvcrd.c */; };
 		E66ABC6314540F9F009D9476 /* pngwio.c in Sources */ = {isa = PBXBuildFile; fileRef = E66ABBD614540F9F009D9476 /* pngwio.c */; };
@@ -624,8 +623,6 @@
 		E66ABBCF14540F9F009D9476 /* pngrtran.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = pngrtran.c; sourceTree = "<group>"; };
 		E66ABBD014540F9F009D9476 /* pngrutil.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = pngrutil.c; sourceTree = "<group>"; };
 		E66ABBD114540F9F009D9476 /* pngset.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = pngset.c; sourceTree = "<group>"; };
-		E66ABBD214540F9F009D9476 /* pngtest.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = pngtest.c; sourceTree = "<group>"; };
-		E66ABBD314540F9F009D9476 /* pngtest.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = pngtest.png; sourceTree = "<group>"; };
 		E66ABBD414540F9F009D9476 /* pngtrans.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = pngtrans.c; sourceTree = "<group>"; };
 		E66ABBD514540F9F009D9476 /* pngvcrd.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = pngvcrd.c; sourceTree = "<group>"; };
 		E66ABBD614540F9F009D9476 /* pngwio.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = pngwio.c; sourceTree = "<group>"; };
@@ -1260,8 +1257,6 @@
 				E66ABBCF14540F9F009D9476 /* pngrtran.c */,
 				E66ABBD014540F9F009D9476 /* pngrutil.c */,
 				E66ABBD114540F9F009D9476 /* pngset.c */,
-				E66ABBD214540F9F009D9476 /* pngtest.c */,
-				E66ABBD314540F9F009D9476 /* pngtest.png */,
 				E66ABBD414540F9F009D9476 /* pngtrans.c */,
 				E66ABBD514540F9F009D9476 /* pngvcrd.c */,
 				E66ABBD614540F9F009D9476 /* pngwio.c */,
@@ -2015,7 +2010,6 @@
 				E66ABC5D14540F9F009D9476 /* pngrtran.c in Sources */,
 				E66ABC5E14540F9F009D9476 /* pngrutil.c in Sources */,
 				E66ABC5F14540F9F009D9476 /* pngset.c in Sources */,
-				E66ABC6014540F9F009D9476 /* pngtest.c in Sources */,
 				E66ABC6114540F9F009D9476 /* pngtrans.c in Sources */,
 				E66ABC6214540F9F009D9476 /* pngvcrd.c in Sources */,
 				E66ABC6314540F9F009D9476 /* pngwio.c in Sources */,
@@ -2138,7 +2132,12 @@
 		E6E2A63412CE48E000923828 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
+				ARCHS = (
+					armv6,
+					"$(ARCHS_STANDARD_32_BIT)",
+				);
+				CLANG_CXX_LIBRARY = "libstdc++";
+				"CLANG_CXX_LIBRARY[sdk=iphoneos5.0][arch=*]" = "libc++";
 				COPY_PHASE_STRIP = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				GCC_UNROLL_LOOPS = YES;
@@ -2152,6 +2151,7 @@
 				LLVM_LTO = NO;
 				PRODUCT_NAME = Cocos;
 				TARGETED_DEVICE_FAMILY = "1,2";
+				"VALID_ARCHS[sdk=iphonesimulator*]" = i386;
 				ZERO_LINK = NO;
 			};
 			name = Release;
@@ -2220,7 +2220,12 @@
 		E6E2A9A812CE52DE00923828 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
+				ARCHS = (
+					armv6,
+					"$(ARCHS_STANDARD_32_BIT)",
+				);
+				CLANG_CXX_LIBRARY = "compiler-default";
+				"CLANG_CXX_LIBRARY[sdk=iphoneos5.0][arch=*]" = "libc++";
 				COPY_PHASE_STRIP = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				GCC_OPTIMIZATION_LEVEL = 0;
@@ -2234,6 +2239,7 @@
 				LLVM_LTO = NO;
 				PRODUCT_NAME = Cocos;
 				TARGETED_DEVICE_FAMILY = "1,2";
+				"VALID_ARCHS[sdk=iphonesimulator*]" = i386;
 				ZERO_LINK = NO;
 			};
 			name = Debug;

@@ -1,0 +1,6 @@
+.svn
+*.xcodeproj/*
+!*.xcodeproj/project.pbxproj
+/build
+*.zip
+*.a

@@ -2142,13 +2142,25 @@
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				GCC_UNROLL_LOOPS = YES;
 				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
-				IPHONEOS_DEPLOYMENT_TARGET = 3.1;
+				IPHONEOS_DEPLOYMENT_TARGET = 3.2;
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					../SharedLibs/Utilities/lib,
 					"\"$(SRCROOT)/src/Box2D/Debug\"",
 				);
 				LLVM_LTO = NO;
+				"OTHER_CFLAGS[arch=armv6]" = (
+					"-DRELEASE_VERSION",
+					"-arch",
+					armv6,
+					"-mno-thumb",
+				);
+				"OTHER_CPLUSPLUSFLAGS[arch=armv6]" = (
+					"-DRELEASE_VERSION",
+					"-arch",
+					armv6,
+					"-mno-thumb",
+				);
 				PRODUCT_NAME = Cocos;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				"VALID_ARCHS[sdk=iphonesimulator*]" = i386;
@@ -2230,13 +2242,25 @@
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
-				IPHONEOS_DEPLOYMENT_TARGET = 3.1;
+				IPHONEOS_DEPLOYMENT_TARGET = 3.2;
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"../SharedLibs/Utilities-Debug/lib",
 					"\"$(SRCROOT)/src/Box2D/Debug\"",
 				);
 				LLVM_LTO = NO;
+				"OTHER_CFLAGS[arch=armv6]" = (
+					"-DRELEASE_VERSION",
+					"-arch",
+					armv6,
+					"-mno-thumb",
+				);
+				"OTHER_CPLUSPLUSFLAGS[arch=armv6]" = (
+					"-DRELEASE_VERSION",
+					"-arch",
+					armv6,
+					"-mno-thumb",
+				);
 				PRODUCT_NAME = Cocos;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				"VALID_ARCHS[sdk=iphonesimulator*]" = i386;

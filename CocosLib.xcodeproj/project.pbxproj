@@ -2136,8 +2136,7 @@
 					armv6,
 					"$(ARCHS_STANDARD_32_BIT)",
 				);
-				CLANG_CXX_LIBRARY = "compiler-default";
-				"CLANG_CXX_LIBRARY[sdk=iphoneos5.0][arch=*]" = "libc++";
+				CLANG_CXX_LIBRARY = "libstdc++";
 				COPY_PHASE_STRIP = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				GCC_UNROLL_LOOPS = YES;
@@ -2151,15 +2150,21 @@
 				LLVM_LTO = NO;
 				"OTHER_CFLAGS[arch=armv6]" = (
 					"-DRELEASE_VERSION",
-					"-arch",
-					armv6,
 					"-mno-thumb",
 				);
 				"OTHER_CPLUSPLUSFLAGS[arch=armv6]" = (
 					"-DRELEASE_VERSION",
-					"-arch",
-					armv6,
 					"-mno-thumb",
+				);
+				"OTHER_CPLUSPLUSFLAGS[sdk=iphoneos*][arch=armv7]" = (
+					"-mthumb",
+					"-mfpu=neon",
+					"-ffast-math",
+					"-ftree-vectorize",
+					"-mfloat-abi=softfp",
+					"-fsingle-precision-constant",
+					"-DNS_BLOCK_ASSERTIONS=1",
+					"-DRELEASE_VERSION",
 				);
 				PRODUCT_NAME = Cocos;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -2236,8 +2241,7 @@
 					armv6,
 					"$(ARCHS_STANDARD_32_BIT)",
 				);
-				CLANG_CXX_LIBRARY = "compiler-default";
-				"CLANG_CXX_LIBRARY[sdk=iphoneos5.0][arch=*]" = "libc++";
+				CLANG_CXX_LIBRARY = "libstdc++";
 				COPY_PHASE_STRIP = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				GCC_OPTIMIZATION_LEVEL = 0;
@@ -2251,14 +2255,10 @@
 				LLVM_LTO = NO;
 				"OTHER_CFLAGS[arch=armv6]" = (
 					"-DRELEASE_VERSION",
-					"-arch",
-					armv6,
 					"-mno-thumb",
 				);
 				"OTHER_CPLUSPLUSFLAGS[arch=armv6]" = (
 					"-DRELEASE_VERSION",
-					"-arch",
-					armv6,
 					"-mno-thumb",
 				);
 				PRODUCT_NAME = Cocos;

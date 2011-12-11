@@ -1881,7 +1881,6 @@
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				PRODUCT_NAME = CocosLib_script;
-				SDKROOT = iphoneos;
 				ZERO_LINK = NO;
 			};
 			name = Debug;
@@ -1894,7 +1893,6 @@
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				PRODUCT_NAME = CocosLib_script;
-				SDKROOT = iphoneos;
 				ZERO_LINK = NO;
 			};
 			name = Release;
@@ -1902,10 +1900,6 @@
 		E6E2A63412CE48E000923828 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = (
-					armv6,
-					"$(ARCHS_STANDARD_32_BIT)",
-				);
 				CLANG_CXX_LIBRARY = "libstdc++";
 				COPY_PHASE_STRIP = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
@@ -1938,7 +1932,6 @@
 				);
 				PRODUCT_NAME = Cocos;
 				TARGETED_DEVICE_FAMILY = "1,2";
-				"VALID_ARCHS[sdk=iphonesimulator*]" = i386;
 				ZERO_LINK = NO;
 			};
 			name = Release;
@@ -2007,10 +2000,6 @@
 		E6E2A9A812CE52DE00923828 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = (
-					armv6,
-					"$(ARCHS_STANDARD_32_BIT)",
-				);
 				CLANG_CXX_LIBRARY = "libstdc++";
 				COPY_PHASE_STRIP = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
@@ -2033,7 +2022,6 @@
 				);
 				PRODUCT_NAME = Cocos;
 				TARGETED_DEVICE_FAMILY = "1,2";
-				"VALID_ARCHS[sdk=iphonesimulator*]" = i386;
 				ZERO_LINK = NO;
 			};
 			name = Debug;

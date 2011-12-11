@@ -42,13 +42,10 @@
  */
 @interface CCAnimation : NSObject
 {
-	NSString			*name_;
 	float				delay_;
 	NSMutableArray		*frames_;
 }
 
-/** name of the animation */
-@property (nonatomic,readwrite,retain) NSString *name;
 /** delay between frames in seconds. */
 @property (nonatomic,readwrite,assign) float delay;
 /** array of frames */

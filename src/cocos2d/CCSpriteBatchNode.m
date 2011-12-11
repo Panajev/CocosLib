@@ -33,22 +33,26 @@
 #import "CCGrid.h"
 #import "CCDrawingPrimitives.h"
 #import "CCTextureCache.h"
+#import "CCShaderCache.h"
+#import "GLProgram.h"
+#import "ccGLState.h"
+#import "CCDirector.h"
 #import "Support/CGPointExtension.h"
+#import "Support/TransformUtils.h"
+#import "Support/CCProfiling.h"
+
+// external
+#import "kazmath/GL/matrix.h"
 
 const NSUInteger defaultCapacity = 29;
 
 #pragma mark -
 #pragma mark CCSpriteBatchNode
 
-static 	SEL selUpdate = NULL;
-static SEL selUpdateAtlasIndex =NULL;
-static SEL selSortMethod =NULL;
-
 @interface CCSpriteBatchNode (private)
--(void) updateBlendFunc;
 -(void) updateAtlasIndex:(CCSprite*) sprite currentIndex:(NSInteger*) curIndex;
 -(void) swap:(NSInteger) oldIndex withNewIndex:(NSInteger) newIndex;
-
+-(void) updateBlendFunc;
 @end
 
 @implementation CCSpriteBatchNode
@@ -58,14 +62,6 @@ static SEL selSortMethod =NULL;
 @synthesize descendants = descendants_;
 
 
-+(void) initialize
-{
-	if ( self == [CCSpriteBatchNode class] ) {
-		selUpdate = @selector(updateTransform);
-		selUpdateAtlasIndex = @selector(updateAtlasIndex:currentIndex:);
-		selSortMethod = @selector(sortAllChildren);
-	}
-}
 /*
  * creation with CCTexture2D
  */
@@ -109,7 +105,7 @@ static SEL selSortMethod =NULL;
 		children_ = [[CCArray alloc] initWithCapacity:capacity];
 		descendants_ = [[CCArray alloc] initWithCapacity:capacity];
 		
-		updateAtlasIndexMethod_ = (__typeof__(updateAtlasIndexMethod_)) [self methodForSelector:selUpdateAtlasIndex];
+		self.shaderProgram = [[CCShaderCache sharedShaderCache] programForKey:kCCShader_PositionTextureColor];
 	}
 	
 	return self;
@@ -140,13 +136,16 @@ static SEL selSortMethod =NULL;
 #pragma mark CCSpriteBatchNode - composition
 
 // override visit.
-// Don't call visit on it's children
+// Don't call visit on its children
 -(void) visit
 {
-	
+	CC_PROFILER_START_CATEGORY(kCCProfilerCategoryBatchSprite, @"CCSpriteBatchNode - visit");
+
+	NSAssert(parent_ != nil, @"CCSpriteBatchNode should NOT be root node");
+
 	// CAREFUL:
-	// This visit is almost identical to CocosNode#visit
-	// with the exception that it doesn't call visit on it's children
+	// This visit is almost identical to CCNode#visit
+	// with the exception that it doesn't call visit on its children
 	//
 	// The alternative is to have a void CCSprite#visit, but
 	// although this is less mantainable, is faster
@@ -154,7 +153,7 @@ static SEL selSortMethod =NULL;
 	if (!visible_)
 		return;
 	
-	glPushMatrix();
+	kmGLPushMatrix();
 	
 	if ( grid_ && grid_.active) {
 		[grid_ beforeDraw];
@@ -165,14 +164,15 @@ static SEL selSortMethod =NULL;
 	[self transform];
 	[self draw];
 	
-	orderOfArrival_=0;
-	
 	if ( grid_ && grid_.active)
 		[grid_ afterDraw:self];
-	
-	glPopMatrix();
-}
 
+	kmGLPopMatrix();
+	
+	orderOfArrival_ = 0;
+	
+	CC_PROFILER_STOP_CATEGORY(kCCProfilerCategoryBatchSprite, @"CCSpriteBatchNode - visit");
+}
 
 // override addChild:
 -(void) addChild:(CCSprite*)child z:(NSInteger)z tag:(NSInteger) aTag
@@ -223,7 +223,7 @@ static SEL selSortMethod =NULL;
 {
 	// Invalidate atlas index. issue #569
 	// useSelfRender should be performed on all descendants. issue #1216
-	[descendants_ makeObjectsPerformSelector:@selector(useSelfRender)];
+	[descendants_ makeObjectsPerformSelector:@selector(setBatchNode:) withObject:nil];
         
 	[super removeAllChildrenWithCleanup:doCleanup];
 
@@ -236,8 +236,8 @@ static SEL selSortMethod =NULL;
 {
 	if (isReorderChildDirty_) 
 	{	
-		NSInteger i,j,length=children_->data->num;
-		CCNode ** x=children_->data->arr;		
+		NSInteger i,j,length = children_->data->num;
+		CCNode ** x = children_->data->arr;		
 		CCNode *tempItem;
 		CCSprite *child;
 
@@ -248,7 +248,7 @@ static SEL selSortMethod =NULL;
 			j = i-1;
 			
 			//continue moving element downwards while zOrder is smaller or when zOrder is the same but orderOfArrival is smaller
-			while(j>=0 && ( tempItem.zOrder < x[j].zOrder || ( tempItem.zOrder == x[j].zOrder && tempItem.orderOfArrival < x[j].orderOfArrival ) ) ) 
+			while(j>=0 && ( tempItem.zOrder < x[j].zOrder || ( tempItem.zOrder == x[j].zOrder && tempItem.orderOfArrival < x[j].orderOfArrival ) ) )
 			{
 				x[j+1] = x[j];
 				j--;
@@ -256,17 +256,19 @@ static SEL selSortMethod =NULL;
 			
 			x[j+1] = tempItem;
 		}
-		
+
 		//sorted now check all children 
 		if ([children_ count] > 0)
 		{
 			//first sort all children recursively based on zOrder
-			CCARRAY_FOREACH(children_, child) child->sortMethod(child,selSortMethod);
+			[children_ makeObjectsPerformSelector:@selector(sortAllChildren)];
 			
 			NSInteger index=0;
 			
-			//fast dispatch, give every child a new atlasIndex based on their relative zOrder (keep parent -> child relations intact) and at the same time reorder descedants and the quads to the right index
-			CCARRAY_FOREACH(children_, child) updateAtlasIndexMethod_(self,selUpdateAtlasIndex,child,&index);
+			//fast dispatch, give every child a new atlasIndex based on their relative zOrder (keep parent -> child relations intact)
+			// and at the same time reorder descedants and the quads to the right index
+			CCARRAY_FOREACH(children_, child)
+				[self updateAtlasIndex:child currentIndex:&index];
 		}
 		
 		isReorderChildDirty_=NO;	
@@ -281,10 +283,10 @@ static SEL selSortMethod =NULL;
 	
 	if( count == 0 )
 	{	
-		oldIndex=sprite.atlasIndex;
-		sprite.atlasIndex=*curIndex;
-		sprite.orderOfArrival=0;
-		if (oldIndex!=*curIndex)
+		oldIndex = sprite.atlasIndex;
+		sprite.atlasIndex = *curIndex;
+		sprite.orderOfArrival = 0;
+		if (oldIndex != *curIndex)
 			[self swap:oldIndex withNewIndex:*curIndex];
 		(*curIndex)++;
 	}
@@ -293,15 +295,16 @@ static SEL selSortMethod =NULL;
 		BOOL needNewIndex=YES;
 		
 		if (((CCSprite*) (array->data->arr[0])).zOrder >= 0) 
-		{//all children are in front of the parent
-			oldIndex=sprite.atlasIndex;
-			sprite.atlasIndex=*curIndex;
-			sprite.orderOfArrival=0;
-			if (oldIndex!=*curIndex)
+		{	
+			//all children are in front of the parent
+			oldIndex = sprite.atlasIndex;
+			sprite.atlasIndex = *curIndex;
+			sprite.orderOfArrival = 0;
+			if (oldIndex != *curIndex)
 				[self swap:oldIndex withNewIndex:*curIndex];
 			(*curIndex)++;
 			
-			needNewIndex=NO;
+			needNewIndex = NO;
 		}
 		
 		CCSprite* child;
@@ -309,17 +312,17 @@ static SEL selSortMethod =NULL;
 		{
 			if (needNewIndex && child.zOrder >= 0) 
 			{
-				oldIndex=sprite.atlasIndex;
-				sprite.atlasIndex=*curIndex;
-				sprite.orderOfArrival=0;
-				if (oldIndex!=*curIndex)
+				oldIndex = sprite.atlasIndex;
+				sprite.atlasIndex = *curIndex;
+				sprite.orderOfArrival = 0;
+				if (oldIndex != *curIndex)
 					[self swap:oldIndex withNewIndex:*curIndex];
 				(*curIndex)++;
-				needNewIndex=NO;
+				needNewIndex = NO;
 				
 			}
-			//fast dispatch
-			updateAtlasIndexMethod_(self,selUpdateAtlasIndex,child,curIndex);
+
+			[self updateAtlasIndex:child currentIndex:curIndex];
 		}	
 		
 		if (needNewIndex) 
@@ -336,10 +339,10 @@ static SEL selSortMethod =NULL;
 
 - (void) swap:(NSInteger) oldIndex withNewIndex:(NSInteger) newIndex
 {
-	id* x=descendants_->data->arr;
-	ccV3F_C4B_T2F_Quad* quads=textureAtlas_.quads;
+	id* x = descendants_->data->arr;
+	ccV3F_C4B_T2F_Quad* quads = textureAtlas_.quads;
 	
-	id tempItem=x[oldIndex];
+	id tempItem = x[oldIndex];
 	ccV3F_C4B_T2F_Quad tempItemQuad=quads[oldIndex];
 	
 	//update the index of other swapped item
@@ -359,58 +362,27 @@ static SEL selSortMethod =NULL;
 #pragma mark CCSpriteBatchNode - draw
 -(void) draw
 {
-	[super draw];
+	CC_PROFILER_START(@"CCSpriteBatchNode - draw");
 
 	// Optimization: Fast Dispatch	
 	if( textureAtlas_.totalQuads == 0 )
 		return;	
-	
-	CCSprite *child;
-	ccArray *array = descendants_->data;
-	
-	NSUInteger i = array->num;
-	id *arr = array->arr;
 
-	if( i > 0 ) {
+	CC_NODE_DRAW_SETUP();
+
+	[children_ makeObjectsPerformSelector:@selector(updateTransform)];
+	
+	ccGLBlendFunc( blendFunc_.src, blendFunc_.dst );
 		
-		while (i-- > 0) {
-			child = *arr++;
-			
-			// fast dispatch
-			child->updateMethod(child, selUpdate);
-			
-#if CC_SPRITEBATCHNODE_DEBUG_DRAW
-			//Issue #528, 1069
-			ccV3F_C4B_T2F_Quad *quads = [textureAtlas_ quads];
-			ccV3F_C4B_T2F_Quad *quad= &(quads[child.atlasIndex]);
-			CGPoint vertices[4]={
-				ccp(quad->tl.vertices.x,quad->tl.vertices.y),
-				ccp(quad->bl.vertices.x,quad->bl.vertices.y),
-				ccp(quad->br.vertices.x,quad->br.vertices.y),
-				ccp(quad->tr.vertices.x,quad->tr.vertices.y),
-			};
-			ccDrawPoly(vertices, 4, YES);
-#endif // CC_SPRITEBATCHNODE_DEBUG_DRAW
-		}
-	}
-	
-	// Default GL states: GL_TEXTURE_2D, GL_VERTEX_ARRAY, GL_COLOR_ARRAY, GL_TEXTURE_COORD_ARRAY
-	// Needed states: GL_TEXTURE_2D, GL_VERTEX_ARRAY, GL_COLOR_ARRAY, GL_TEXTURE_COORD_ARRAY
-	// Unneeded states: -
-	
-	BOOL newBlend = blendFunc_.src != CC_BLEND_SRC || blendFunc_.dst != CC_BLEND_DST;
-	if( newBlend )
-		glBlendFunc( blendFunc_.src, blendFunc_.dst );
-	
 	[textureAtlas_ drawQuads];
-	if( newBlend )
-		glBlendFunc(CC_BLEND_SRC, CC_BLEND_DST);
+	
+	CC_PROFILER_STOP(@"CCSpriteBatchNode - draw");
 }
 
 #pragma mark CCSpriteBatchNode - private
 -(void) increaseAtlasCapacity
 {
-	// if we're going beyond the current TextureAtlas's capacity,
+	// if we're going beyond the current CCTextureAtlas's capacity,
 	// all the previously initialized sprites will need to redo their texture coords
 	// this is likely computationally expensive
 	NSUInteger quantity = (textureAtlas_.capacity + 1) * 4 / 3;
@@ -424,7 +396,7 @@ static SEL selSortMethod =NULL;
 		// serious problems
 		CCLOG(@"cocos2d: WARNING: Not enough memory to resize the atlas");
 		NSAssert(NO,@"XXX: CCSpriteBatchNode#increaseAtlasCapacity SHALL handle this assert");
-	}	
+	}		
 }
 
 
@@ -523,7 +495,7 @@ static SEL selSortMethod =NULL;
 // add child helper
 -(void) insertChild:(CCSprite*)sprite inAtlasAtIndex:(NSUInteger)index
 {
-	[sprite useBatchNode:self];
+	[sprite setBatchNode:self];
 	[sprite setAtlasIndex:index];
 	[sprite setDirty: YES];
 	
@@ -556,7 +528,7 @@ static SEL selSortMethod =NULL;
 -(void) appendChild:(CCSprite*)sprite
 {
 	isReorderChildDirty_=YES;
-	[sprite useBatchNode:self];
+	[sprite setBatchNode:self];
 	[sprite setDirty: YES];
 	
 	if(textureAtlas_.totalQuads == textureAtlas_.capacity)
@@ -575,7 +547,8 @@ static SEL selSortMethod =NULL;
 	
 	// add children recursively
 	CCSprite* child;
-	CCARRAY_FOREACH(sprite.children, child) [self appendChild:child];
+	CCARRAY_FOREACH(sprite.children, child)
+		[self appendChild:child];
 }
 
 
@@ -586,7 +559,7 @@ static SEL selSortMethod =NULL;
 	[textureAtlas_ removeQuadAtIndex:sprite.atlasIndex];
 	
 	// Cleanup sprite. It might be reused (issue #569)
-	[sprite useSelfRender];
+	[sprite setBatchNode:nil];
 	
 	ccArray *descendantsData = descendants_->data;
 	NSUInteger index = ccArrayGetIndexOfObject(descendantsData, sprite);
@@ -630,3 +603,4 @@ static SEL selSortMethod =NULL;
 	return textureAtlas_.texture;
 }
 @end
+

@@ -27,9 +27,9 @@
 #import "ccConfig.h"
 #import "ccTypes.h"
 
-// OpenGL related
-#import "Platforms/CCGL.h"
 #import "CCProtocols.h"
+#import "Platforms/CCGL.h"
+#import "kazmath/mat4.h"
 
 /** @typedef ccDirectorProjection
  Possible OpenGL projections used by director
@@ -46,13 +46,24 @@ typedef enum {
 	
 	/// Detault projection is 3D projection
 	kCCDirectorProjectionDefault = kCCDirectorProjection3D,
-	
-	// backward compatibility stuff
-	CCDirectorProjection2D = kCCDirectorProjection2D,
-	CCDirectorProjection3D = kCCDirectorProjection3D,
-	CCDirectorProjectionCustom = kCCDirectorProjectionCustom,
 
 } ccDirectorProjection;
+
+/** @typdef ccDirectorStats
+ Possible statistics that are going to be dispayed by the CCDirector
+ @since v2.0
+ */
+typedef enum {
+	/// No statistics displayed
+	kCCDirectorStatsNone,
+
+	/// Frames Per Second statistics
+	kCCDirectorStatsFPS,
+	
+	/// Milliseconds per Frame statistics
+	kCCDirectorStatsMPF,
+
+} ccDirectorStats;
 
 
 @class CCLabelAtlas;
@@ -66,7 +77,6 @@ and when to execute the Scenes.
   - setting the OpenGL pixel format (default on is RGB565)
   - setting the OpenGL buffer depth (default one is 0-bit)
   - setting the projection (default one is 3D)
-  - setting the orientation (default one is Protrait)
  
  Since the CCDirector is a singleton, the standard way to use it is by calling:
   - [[CCDirector sharedDirector] methodName];
@@ -85,17 +95,16 @@ and when to execute the Scenes.
 	NSTimeInterval animationInterval_;
 	NSTimeInterval oldAnimationInterval_;	
 	
-	/* display FPS ? */
-	BOOL displayFPS_;
+	/* stats */
+	ccDirectorStats	displayStats_;
 
 	NSUInteger frames_;
 	NSUInteger totalFrames_;
+	ccTime millisecondsPerFrame_;
 
 	ccTime accumDt_;
 	ccTime frameRate_;
-#if	CC_DIRECTOR_FAST_FPS
 	CCLabelAtlas *FPSLabel_;
-#endif
 	
 	/* is the running scene paused */
 	BOOL isPaused_;
@@ -136,12 +145,7 @@ and when to execute the Scenes.
 	CGSize	winSizeInPixels_;
 
 	/* the cocos2d running thread */
-	NSThread	*runningThread_;
-	
-	// profiler
-#if CC_ENABLE_PROFILERS
-	ccTime accumDtForProfiler_;
-#endif
+	NSThread	*runningThread_;	
 }
 
 /** returns the cocos2d thread.
@@ -154,20 +158,20 @@ and when to execute the Scenes.
 @property (nonatomic,readonly) CCScene* runningScene;
 /** The FPS value */
 @property (nonatomic,readwrite, assign) NSTimeInterval animationInterval;
-/** Whether or not to display the FPS on the bottom-left corner */
-@property (nonatomic,readwrite, assign) BOOL displayFPS;
+/** Whether or not to display director statistics */
+@property (nonatomic, readwrite, assign) ccDirectorStats displayStats;
 /** The OpenGLView, where everything is rendered */
 @property (nonatomic,readwrite,retain) CC_GLVIEW *openGLView;
 /** whether or not the next delta time will be zero */
 @property (nonatomic,readwrite,assign) BOOL nextDeltaTimeZero;
 /** Whether or not the Director is paused */
 @property (nonatomic,readonly) BOOL isPaused;
-/** Sets an OpenGL projection
- @since v0.8.2
- */
+/** Sets an OpenGL projection */
 @property (nonatomic,readwrite) ccDirectorProjection projection;
 /** How many frames were called since the director started */
 @property (nonatomic,readonly) NSUInteger	totalFrames;
+/** milliseconds per frame */
+@property (nonatomic, readonly) ccTime millisecondsPerFrame;
 
 /** Whether or not the replaced scene will receive the cleanup message.
  If the new scene is pushed, then the old scene won't receive the "cleanup" message.
@@ -192,23 +196,22 @@ and when to execute the Scenes.
 +(CCDirector *)sharedDirector;
 
 
+// Statistics
+/** Whether or not to display the FPS on the bottom-left corner
+ @deprecated Use setDisplayStats:kCCDirectorStatsFPS instead
+ */
+-(void) setDisplayFPS:(BOOL)display DEPRECATED_ATTRIBUTE;
 
 // Window size
 
-/** returns the size of the OpenGL view in points.
- It takes into account any possible rotation (device orientation) of the window
- */
+/** returns the size of the OpenGL view in points */
 - (CGSize) winSize;
 
 /** returns the size of the OpenGL view in pixels.
- It takes into account any possible rotation (device orientation) of the window.
  On Mac winSize and winSizeInPixels return the same value.
  */
 - (CGSize) winSizeInPixels;
-/** returns the display size of the OpenGL view in pixels.
- It doesn't take into account any possible rotation of the window.
- */
--(CGSize) displaySizeInPixels;
+
 /** changes the projection size */
 -(void) reshapeProjection:(CGSize)newWindowSize;
 
@@ -297,13 +300,13 @@ and when to execute the Scenes.
 
 /** sets the OpenGL default values */
 -(void) setGLDefaultValues;
-
 /** enables/disables OpenGL alpha blending */
 - (void) setAlphaBlending: (BOOL) on;
 /** enables/disables OpenGL depth test */
 - (void) setDepthTest: (BOOL) on;
 
-// Profiler
--(void) showProfilers;
-
+// helper
+/** creates the FPS label */
+-(void) createFPSLabel;
 @end
+

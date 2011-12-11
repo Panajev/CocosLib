@@ -31,10 +31,6 @@
 #import "ccConfig.h"
 
 @class CCParticleBatchNode;
-#if CC_ENABLE_PROFILERS
-@class CCProfilingTimer;
-
-#endif
 
 //* @enum
 enum {
@@ -89,7 +85,6 @@ enum {
  */
 typedef struct sCCParticle {
 	CGPoint		pos;
-	float		z;
 	CGPoint		startPos;
 
 	ccColor4F	color;
@@ -294,18 +289,14 @@ typedef void (*CC_UPDATE_PARTICLE_IMP)(id, SEL, tCCParticle*, CGPoint);
 	CC_UPDATE_PARTICLE_IMP	updateParticleImp;
 	SEL						updateParticleSel;
 	
-	//for batching
+	// for batching. If nil, then it won't be batched
 	CCParticleBatchNode *batchNode_; 
-	BOOL useBatchNode_; 
-	//index of system in batch node array
+
+	// index of system in batch node array
 	NSUInteger atlasIndex_; 
-	//YES if scaled or rotated
-	BOOL transformSystemDirty_;
 	
-// profiling
-#if CC_ENABLE_PROFILERS
-	CCProfilingTimer* _profilingTimer;
-#endif
+	//YES if scaled or rotated
+	BOOL transformSystemDirty_;	
 }
 
 /** Is the emitter active */
@@ -410,9 +401,10 @@ typedef void (*CC_UPDATE_PARTICLE_IMP)(id, SEL, tCCParticle*, CGPoint);
  */
 @property (nonatomic,readwrite) NSInteger emitterMode;
 
-@property (nonatomic,readwrite) NSUInteger atlasIndex;
+/** weak reference to the CCSpriteBatchNode that renders the CCSprite */
+@property (nonatomic,readwrite,assign) CCParticleBatchNode *batchNode;
 
-@property (nonatomic,readonly) BOOL useBatchNode; 
+@property (nonatomic,readwrite) NSUInteger atlasIndex;
 
 /** creates an initializes a CCParticleSystem from a plist file.
  This plist files can be creted manually or with Particle Designer:
@@ -428,17 +420,13 @@ typedef void (*CC_UPDATE_PARTICLE_IMP)(id, SEL, tCCParticle*, CGPoint);
  */
 -(id) initWithFile:(NSString*) plistFile;
 
-/** initializes a CCQuadParticleSystem from a NSDictionary.
+/** initializes a particle system from a NSDictionary.
  @since v0.99.3
  */
 -(id) initWithDictionary:(NSDictionary*)dictionary;
 
-//! Initializes a system with a fixed number of particles and whether a batchnode is used for rendering
+//! Initializes a system with a fixed number of particles
 -(id) initWithTotalParticles:(NSUInteger) numberOfParticles;
-//! Add a particle to the emitter
--(BOOL) addParticle;
-//! Initializes a particle
--(void) initParticle: (tCCParticle*) particle;
 //! stop emitting particles. Running particles will continue to run until they die
 -(void) stopSystem;
 //! Kill all living particles.
@@ -456,11 +444,4 @@ typedef void (*CC_UPDATE_PARTICLE_IMP)(id, SEL, tCCParticle*, CGPoint);
 
 -(void) updateWithNoTime;
 
-//switch to self rendering
--(void) useSelfRender;
-//switch to batch node rendering
--(void) useBatchNode:(CCParticleBatchNode*) batchNode;
-
-//used internally by CCParticleBathNode 
--(void) batchNodeInitialization;
 @end

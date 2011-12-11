@@ -47,14 +47,12 @@
 
 // cocos2d
 #import "ccConfig.h"
-#if CC_ENABLE_PROFILERS
-#import "Support/CCProfiling.h"
-#endif
 #import "CCParticleSystem.h"
 #import "CCParticleBatchNode.h"
 #import "CCTextureCache.h"
 #import "CCTextureAtlas.h"
 #import "ccMacros.h"
+#import "Support/CCProfiling.h"
 
 // support
 #import "Support/OpenGL_Internal.h"
@@ -80,8 +78,6 @@
 @synthesize autoRemoveOnFinish = autoRemoveOnFinish_;
 @synthesize emitterMode = emitterMode_;
 @synthesize atlasIndex = atlasIndex_;
-@synthesize useBatchNode = useBatchNode_;
-
 
 +(id) particleWithFile:(NSString*) plistFile
 {
@@ -105,7 +101,7 @@
 
 -(id) initWithDictionary:(NSDictionary *)dictionary
 {
-	NSUInteger maxParticles = [[dictionary valueForKey:@"maxParticles"] intValue];
+	NSUInteger maxParticles = [[dictionary valueForKey:@"maxParticles"] integerValue];
 	// self, not super
 	
 	if ((self=[self initWithTotalParticles:maxParticles] ) )
@@ -303,11 +299,6 @@
 						
 		autoRemoveOnFinish_ = NO;
 
-		// profiling
-#if CC_ENABLE_PROFILERS
-		_profilingTimer = [[CCProfiler timerWithName:@"particle system" andInstance:self] retain];
-#endif
-		
 		// Optimization: compile udpateParticle method
 		updateParticleSel = @selector(updateQuadWithParticle:newPosition:);
 		updateParticleImp = (CC_UPDATE_PARTICLE_IMP) [self methodForSelector:updateParticleSel];
@@ -326,25 +317,8 @@
 	free( particles );
 
 	[texture_ release];
-	// profiling
-#if CC_ENABLE_PROFILERS
-	[CCProfiler releaseTimer:_profilingTimer];
-#endif
 	
 	[super dealloc];
-}
-
--(BOOL) addParticle
-{
-	if( [self isFull] )
-		return NO;
-	
-	tCCParticle * particle = &particles[ particleCount ];
-		
-	[self initParticle: particle];		
-	particleCount++;
-				
-	return YES;
 }
 
 -(void) initParticle: (tCCParticle*) particle
@@ -358,11 +332,7 @@
 	// position
 	particle->pos.x = sourcePosition.x + posVar.x * CCRANDOM_MINUS1_1();
 	particle->pos.y = sourcePosition.y + posVar.y * CCRANDOM_MINUS1_1();
-	
-	//CCLOG(@"particle pos %f %f n pos %f %f",particle->pos.x,particle->pos.y, position_.x,position_.y);
-	particle->pos.x *= CC_CONTENT_SCALE_FACTOR();
-	particle->pos.y *= CC_CONTENT_SCALE_FACTOR();
-	
+
 	// Color
 	ccColor4F start;
 	start.r = clampf( startColor.r + startColorVar.r * CCRANDOM_MINUS1_1(), 0, 1);
@@ -385,7 +355,6 @@
 	// size
 	float startS = startSize + startSizeVar * CCRANDOM_MINUS1_1();
 	startS = MAX(0, startS); // No negative value
-	startS *= CC_CONTENT_SCALE_FACTOR();
 	
 	particle->size = startS;
 	if( endSize == kCCParticleStartSizeEqualToEndSize )
@@ -393,7 +362,6 @@
 	else {
 		float endS = endSize + endSizeVar * CCRANDOM_MINUS1_1();
 		endS = MAX(0, endS);	// No negative values
-		endS *= CC_CONTENT_SCALE_FACTOR();
 		particle->deltaSize = (endS - startS) / particle->timeToLive;
 	}
 	
@@ -404,13 +372,12 @@
 	particle->deltaRotation = (endA - startA) / particle->timeToLive;
 	
 	// position
-	if( positionType_ == kCCPositionTypeFree ) {
-		CGPoint p = [self convertToWorldSpace:CGPointZero];
-		particle->startPos = ccpMult( p, CC_CONTENT_SCALE_FACTOR() );
-	}
-	else if( positionType_ == kCCPositionTypeRelative ) {
-		particle->startPos = ccpMult( position_, CC_CONTENT_SCALE_FACTOR() );
-	}
+	if( positionType_ == kCCPositionTypeFree )
+		particle->startPos = [self convertToWorldSpace:CGPointZero];
+    
+	else if( positionType_ == kCCPositionTypeRelative )
+		particle->startPos = position_;
+    
 	
 	// direction
 	float a = CC_DEGREES_TO_RADIANS( angle + angleVar * CCRANDOM_MINUS1_1() );	
@@ -420,19 +387,15 @@
 
 		CGPoint v = {cosf( a ), sinf( a )};
 		float s = mode.A.speed + mode.A.speedVar * CCRANDOM_MINUS1_1();
-		s *= CC_CONTENT_SCALE_FACTOR();
 		
 		// direction
 		particle->mode.A.dir = ccpMult( v, s );
 		
 		// radial accel
 		particle->mode.A.radialAccel = mode.A.radialAccel + mode.A.radialAccelVar * CCRANDOM_MINUS1_1();
-		particle->mode.A.radialAccel *= CC_CONTENT_SCALE_FACTOR();
 		
 		// tangential accel
 		particle->mode.A.tangentialAccel = mode.A.tangentialAccel + mode.A.tangentialAccelVar * CCRANDOM_MINUS1_1();
-		particle->mode.A.tangentialAccel *= CC_CONTENT_SCALE_FACTOR();
-
 	}
 	
 	// Mode Radius: B
@@ -440,9 +403,6 @@
 		// Set the default diameter of the particle from the source position
 		float startRadius = mode.B.startRadius + mode.B.startRadiusVar * CCRANDOM_MINUS1_1();
 		float endRadius = mode.B.endRadius + mode.B.endRadiusVar * CCRANDOM_MINUS1_1();
-
-		startRadius *= CC_CONTENT_SCALE_FACTOR();
-		endRadius *= CC_CONTENT_SCALE_FACTOR();
 		
 		particle->mode.B.radius = startRadius;
 
@@ -453,9 +413,20 @@
 	
 		particle->mode.B.angle = a;
 		particle->mode.B.degreesPerSecond = CC_DEGREES_TO_RADIANS(mode.B.rotatePerSecond + mode.B.rotatePerSecondVar * CCRANDOM_MINUS1_1());
-	}	
+	}		
+}
+
+-(BOOL) addParticle
+{
+	if( [self isFull] )
+		return NO;
 	
-	particle->z=vertexZ_; 
+	tCCParticle * particle = &particles[ particleCount ];
+	
+	[self initParticle: particle];		
+	particleCount++;
+	
+	return YES;
 }
 
 -(void) stopSystem
@@ -484,6 +455,8 @@
 #pragma mark ParticleSystem - MainLoop
 -(void) update: (ccTime) dt
 {
+	CC_PROFILER_START_CATEGORY(kCCProfilerCategoryParticles , @"CCParticleSystem - update");
+
 	if( active && emissionRate ) {
 		float rate = 1.0f / emissionRate;
 		emitCounter += dt;
@@ -499,26 +472,12 @@
 	
 	particleIdx = 0;
 	
-#if CC_ENABLE_PROFILERS
-	CCProfilingBeginTimingBlock(_profilingTimer);
-#endif
-		
-	CGPoint currentPosition;
-	//if (useBatchNode_) currentPosition = [self.parent convertToWorldSpace:self.position];
-	//else 
-	currentPosition = CGPointZero;
-	
-	if( positionType_ == kCCPositionTypeFree ) {
+	CGPoint currentPosition = CGPointZero;
+	if( positionType_ == kCCPositionTypeFree )
 		currentPosition = [self convertToWorldSpace:CGPointZero];
-		currentPosition.x *= CC_CONTENT_SCALE_FACTOR();
-		currentPosition.y *= CC_CONTENT_SCALE_FACTOR();
-	}
-	else if( positionType_ == kCCPositionTypeRelative ) {
-	//currentPosition = [self convertToWorldSpace:CGPointZero];
+    
+	else if( positionType_ == kCCPositionTypeRelative )
 		currentPosition = position_;
-		currentPosition.x *= CC_CONTENT_SCALE_FACTOR();
-		currentPosition.y *= CC_CONTENT_SCALE_FACTOR();
-	}
 	
 	if (visible_) 
 	{
@@ -593,15 +552,13 @@
 				} else
 					newPos = p->pos;
 				
-				//translate newPos to correct position, since matrix transform isn't performed in batchnode
-				//don't update the particle with the new position information, it will interfere with the radius and tangential calculations
-				if (useBatchNode_)
+				// translate newPos to correct position, since matrix transform isn't performed in batchnode
+				// don't update the particle with the new position information, it will interfere with the radius and tangential calculations
+				if (batchNode_)
 				{
-						newPos.x += positionInPixels_.x; 
-						newPos.y += positionInPixels_.y;
+					newPos.x+=position_.x; 
+					newPos.y+=position_.y;
 				}
-				
-				p->z = vertexZ_;
 				
 				updateParticleImp(self, updateParticleSel, p, newPos);
 				
@@ -610,12 +567,12 @@
 
 			} else {
 				// life < 0
-				NSUInteger currentIndex = p->atlasIndex;
+				NSInteger currentIndex = p->atlasIndex;
 				
 				if( particleIdx != particleCount-1 )
 					particles[particleIdx] = particles[particleCount-1];
 								
-				if (useBatchNode_) 
+				if (batchNode_) 
 				{
 					//disable the switched particle 
 					[batchNode_ disableParticle:(atlasIndex_+currentIndex)];
@@ -635,14 +592,11 @@
 		}//while
 		transformSystemDirty_ = NO;
 	}
-	
-#if CC_ENABLE_PROFILERS
-	CCProfilingEndTimingBlock(_profilingTimer);
-#endif
-	
-#ifdef CC_USES_VBO
-	if (!useBatchNode_) [self postStep];
-#endif
+
+	if (!batchNode_)
+		[self postStep];
+
+	CC_PROFILER_STOP_CATEGORY(kCCProfilerCategoryParticles , @"CCParticleSystem - update");
 }
 
 -(void) updateWithNoTime
@@ -852,25 +806,25 @@
 
 #pragma mark ParticleSystem - methods for batchNode rendering
 
--(void) useSelfRender
+-(CCParticleBatchNode*) batchNode
 {
-	useBatchNode_ = NO;
+	return batchNode_;
 }
 
--(void) useBatchNode:(CCParticleBatchNode*) batchNode
+-(void) setBatchNode:(CCParticleBatchNode*) batchNode
 {
-	batchNode_ = batchNode; 
-	useBatchNode_ = YES;
-	
-	//each particle needs a unique index
-	for (NSUInteger i = 0; i < totalParticles; i++)
-	{
-		particles[i].atlasIndex=i;	
+	if( batchNode_ != batchNode ) {
+		
+		batchNode_ = batchNode; // weak reference
+
+		if( batchNode ) {
+			//each particle needs a unique index
+			for (int i = 0; i < totalParticles; i++)
+			{
+				particles[i].atlasIndex=i;	
+			}
+		}
 	}
-}
-
--(void) batchNodeInitialization
-{//override this
 }
 
 //don't use a transform matrix, this is faster

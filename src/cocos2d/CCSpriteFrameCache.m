@@ -29,8 +29,10 @@
  */
 
 /*
- * To create sprite frames and texture atlas, use this tool:
- * http://zwoptex.zwopple.com/
+ * To create sprite frames and texture atlas, use any of these tools:
+ * http://zwoptexapp.com/
+ * http://www.texturepacker.com/
+ *
  */
 
 #import "Platforms/CCNS.h"
@@ -94,7 +96,7 @@ static CCSpriteFrameCache *sharedSpriteFrameCache_=nil;
 
 #pragma mark CCSpriteFrameCache - loading sprite frames
 
--(void) addSpriteFramesWithDictionary:(NSDictionary*)dictionary texture:(CCTexture2D*)texture
+-(void) addSpriteFramesWithDictionary:(NSDictionary*)dictionary textureReference:(id)textureReference
 {
 	/*
 	 Supported Zwoptex Formats:
@@ -105,7 +107,7 @@ static CCSpriteFrameCache *sharedSpriteFrameCache_=nil;
 	*/
 	NSDictionary *metadataDict = [dictionary objectForKey:@"metadata"];
 	NSDictionary *framesDict = [dictionary objectForKey:@"frames"];
-
+	
 	int format = 0;
 	
 	// get the format
@@ -113,8 +115,13 @@ static CCSpriteFrameCache *sharedSpriteFrameCache_=nil;
 		format = [[metadataDict objectForKey:@"format"] intValue];
 	
 	// check the format
-	NSAssert( format >= 0 && format <= 3, @"cocos2d: WARNING: format is not supported for CCSpriteFrameCache addSpriteFramesWithDictionary:texture:");
+	NSAssert( format >= 0 && format <= 3, @"cocos2d: WARNING: format is not supported for CCSpriteFrameCache addSpriteFramesWithDictionary:textureFilename:");
 	
+	// SpriteFrame info
+	CGRect rectInPixels;
+	BOOL isRotated;
+	CGPoint frameOffset;
+	CGSize originalSize;
 	
 	// add real frames
 	for(NSString *frameDictKey in framesDict) {
@@ -136,13 +143,12 @@ static CCSpriteFrameCache *sharedSpriteFrameCache_=nil;
 			// abs ow/oh
 			ow = abs(ow);
 			oh = abs(oh);
-			// create frame
-			
-			spriteFrame = [[CCSpriteFrame alloc] initWithTexture:texture
-													rectInPixels:CGRectMake(x, y, w, h)
-														 rotated:NO
-														  offset:CGPointMake(ox, oy)
-													originalSize:CGSizeMake(ow, oh)];
+            
+			// set frame info
+			rectInPixels = CGRectMake(x, y, w, h);
+			isRotated = NO;
+			frameOffset = CGPointMake(ox, oy);
+			originalSize = CGSizeMake(ow, oh);
 		} else if(format == 1 || format == 2) {
 			CGRect frame = CCRectFromString([frameDict objectForKey:@"frame"]);
 			BOOL rotated = NO;
@@ -154,12 +160,11 @@ static CCSpriteFrameCache *sharedSpriteFrameCache_=nil;
 			CGPoint offset = CCPointFromString([frameDict objectForKey:@"offset"]);
 			CGSize sourceSize = CCSizeFromString([frameDict objectForKey:@"sourceSize"]);
 			
-			// create frame
-			spriteFrame = [[CCSpriteFrame alloc] initWithTexture:texture
-													rectInPixels:frame
-														 rotated:rotated
-														  offset:offset
-													originalSize:sourceSize];
+			// set frame info
+			rectInPixels = frame;
+			isRotated = rotated;
+			frameOffset = offset;
+			originalSize = sourceSize;
 		} else if(format == 3) {
 			// get values
 			CGSize spriteSize = CCSizeFromString([frameDict objectForKey:@"spriteSize"]);
@@ -177,41 +182,76 @@ static CCSpriteFrameCache *sharedSpriteFrameCache_=nil;
 				[spriteFramesAliases_ setObject:frameDictKey forKey:alias];
 			}
 			
-			// create frame
-			spriteFrame = [[CCSpriteFrame alloc] initWithTexture:texture 
-													rectInPixels:CGRectMake(textureRect.origin.x, textureRect.origin.y, spriteSize.width, spriteSize.height) 
-														 rotated:textureRotated 
-														  offset:spriteOffset 
-													originalSize:spriteSourceSize];
+			// set frame info
+			rectInPixels = CGRectMake(textureRect.origin.x, textureRect.origin.y, spriteSize.width, spriteSize.height);
+			isRotated = textureRotated;
+			frameOffset = spriteOffset;
+			originalSize = spriteSourceSize;
 		}
 
+		NSString *textureFileName = nil;
+		CCTexture2D * texture = nil;
+		
+		if ( [textureReference isKindOfClass:[NSString class]] )
+		{
+			textureFileName	= textureReference;
+		}
+		else if ( [textureReference isKindOfClass:[CCTexture2D class]] )
+		{
+			texture = textureReference;
+		}
+		
+		if ( textureFileName )
+		{
+			spriteFrame = [[CCSpriteFrame alloc] initWithTextureFilename:textureFileName rectInPixels:rectInPixels rotated:isRotated offset:frameOffset originalSize:originalSize];
+		}
+		else
+		{
+			spriteFrame = [[CCSpriteFrame alloc] initWithTexture:texture rectInPixels:rectInPixels rotated:isRotated offset:frameOffset originalSize:originalSize];
+		}
+		
 		// add sprite frame
 		[spriteFrames_ setObject:spriteFrame forKey:frameDictKey];
 		[spriteFrame release];
 	}
 }
 
--(void) addSpriteFramesWithFile:(NSString*)plist texture:(CCTexture2D*)texture
+-(void) addSpriteFramesWithDictionary:(NSDictionary*)dictionary textureFilename:(NSString*)textureFilename
 {
+	return [self addSpriteFramesWithDictionary:dictionary textureReference:textureFilename];
+}
+
+-(void) addSpriteFramesWithDictionary:(NSDictionary *)dictionary texture:(CCTexture2D *)texture
+{
+	return [self addSpriteFramesWithDictionary:dictionary textureReference:texture];
+}
+
+-(void) addSpriteFramesWithFile:(NSString*)plist textureReference:(id)textureReference
+{
+	NSAssert(textureReference, @"textureReference should not be nil");
+	NSAssert(plist, @"plist filename should not be nil");
+	
 	NSString *path = [CCFileUtils fullPathFromRelativePath:plist];
 	NSDictionary *dict = [NSDictionary dictionaryWithContentsOfFile:path];
 
-	[self addSpriteFramesWithDictionary:dict texture:texture];
+	[self addSpriteFramesWithDictionary:dict textureReference:textureReference];
 }
 
--(void) addSpriteFramesWithFile:(NSString*)plist textureFile:(NSString*)textureFileName
+-(void) addSpriteFramesWithFile:(NSString*)plist textureFilename:(NSString*)textureFilename
 {
-	NSAssert( textureFileName, @"Invalid texture file name");
-	CCTexture2D *texture = [[CCTextureCache sharedTextureCache] addImage:textureFileName];
-	
-	if( texture )
-		[self addSpriteFramesWithFile:plist texture:texture];
-	else
-		CCLOG(@"cocos2d: CCSpriteFrameCache: couldn't load texture file. File not found: %@", textureFileName);
+	return [self addSpriteFramesWithFile:plist textureReference:textureFilename];
 }
+
+-(void) addSpriteFramesWithFile:(NSString*)plist texture:(CCTexture2D*)texture
+{
+	return [self addSpriteFramesWithFile:plist textureReference:texture];
+}
+
 
 -(void) addSpriteFramesWithFile:(NSString*)plist
 {
+	NSAssert(plist, @"plist filename should not be nil");
+
     NSString *path = [CCFileUtils fullPathFromRelativePath:plist];
     NSDictionary *dict = [NSDictionary dictionaryWithContentsOfFile:path];
 	
@@ -235,13 +275,8 @@ static CCSpriteFrameCache *sharedSpriteFrameCache_=nil;
 		CCLOG(@"cocos2d: CCSpriteFrameCache: Trying to use file '%@' as texture", texturePath); 
     }
 	
-    CCTexture2D *texture = [[CCTextureCache sharedTextureCache] addImage:texturePath];
 	
-	if( texture )
-		[self addSpriteFramesWithDictionary:dict texture:texture];
-	
-	else
-		CCLOG(@"cocos2d: CCSpriteFrameCache: Couldn't load texture");
+	[self addSpriteFramesWithDictionary:dict textureFilename:texturePath];
 }
 
 -(void) addSpriteFrame:(CCSpriteFrame*)frame name:(NSString*)frameName

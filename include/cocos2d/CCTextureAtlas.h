@@ -47,10 +47,9 @@
 	ccV3F_C4B_T2F_Quad	*quads_;	// quads to be rendered
 	GLushort			*indices_;
 	CCTexture2D			*texture_;
-#if CC_USES_VBO
+	GLuint				VAOname_;
 	GLuint				buffersVBO_[2]; //0: vertex  1: indices
 	BOOL				dirty_; //indicates whether or not the array buffer of the VBO needs to be updated
-#endif // CC_USES_VBO
 }
 
 /** quantity of quads that are going to be drawn */
@@ -105,18 +104,13 @@
  this method doesn't enlarge the array when amount + index > totalQuads
  @since v1.1
 */
--(void) insertQuads:(ccV3F_C4B_T2F_Quad*)quads atIndex:(NSUInteger)index amount:(NSUInteger) amount;
+-(void) insertQuads:(ccV3F_C4B_T2F_Quad*)quads atIndex:(NSUInteger)index amount:(NSUInteger)amount;
 
 /** Removes the quad that is located at a certain index and inserts it at a new index
  This operation is faster than removing and inserting in a quad in 2 different steps
  @since v0.7.2
 */
 -(void) insertQuadFromIndex:(NSUInteger)fromIndex atIndex:(NSUInteger)newIndex;
-
-/** Inserts a amount of quads from oldIndex at newIndex, while moving quads at newIndex - oldIndex back accordingly 
- @since v1.1
- */
--(void) insertQuadsFromIndex:(NSUInteger)oldIndex amount:(NSUInteger) amount atIndex:(NSUInteger)newIndex;
 
 /** removes a quad at a given index number.
  The capacity remains the same, but the total number of quads to be drawn is reduced in 1
@@ -149,6 +143,11 @@
  @since 1.1
 */
 - (void) increaseTotalQuadsWith:(NSUInteger) amount;
+
+/** Moves an amount of quads from oldIndex at newIndex
+ @since v1.1
+ */
+-(void) moveQuadsFromIndex:(NSUInteger)oldIndex amount:(NSUInteger) amount atIndex:(NSUInteger)newIndex;
 
 /** 
  Moves quads from index till totalQuads to the newIndex

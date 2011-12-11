@@ -1,7 +1,7 @@
 /*
  * cocos2d for iPhone: http://www.cocos2d-iphone.org
  *
- * Copyright (c) 2008-2010 Ricardo Quesada
+ * Copyright (c) 2008-2011 Ricardo Quesada
  * Copyright (c) 2011 Zynga Inc.
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -29,9 +29,15 @@
 #import "ccMacros.h"
 #import "CCDrawingPrimitives.h"
 #import "CCLabelAtlas.h"
+#import "CCShaderCache.h"
+#import "GLProgram.h"
+#import "ccGLState.h"
+#import "CCDirector.h"
 #import "Support/CGPointExtension.h"
+#import "Support/TransformUtils.h"
 
-
+// external
+#import "kazmath/GL/matrix.h"
 
 @implementation CCLabelAtlas
 
@@ -73,23 +79,27 @@
 	CCTexture2D *texture = [textureAtlas_ texture];
 	float textureWide = [texture pixelsWide];
 	float textureHigh = [texture pixelsHigh];
+    float itemWidthInPixels = itemWidth_ * CC_CONTENT_SCALE_FACTOR();
+    float itemHeightInPixels = itemHeight_ * CC_CONTENT_SCALE_FACTOR();
 
-	for( NSUInteger i=0; i<n; i++) {
+
+	for( NSUInteger i=0; i<n; i++)
+	{
 		unsigned char a = s[i] - mapStartChar_;
 		float row = (a % itemsPerRow_);
 		float col = (a / itemsPerRow_);
 		
 #if CC_FIX_ARTIFACTS_BY_STRECHING_TEXEL
 		// Issue #938. Don't use texStepX & texStepY
-		float left		= (2*row*itemWidth_+1)/(2*textureWide);
-		float right		= left+(itemWidth_*2-2)/(2*textureWide);
-		float top		= (2*col*itemHeight_+1)/(2*textureHigh);
-		float bottom	= top+(itemHeight_*2-2)/(2*textureHigh);
+		float left		= (2*row*itemWidthInPixels+1)/(2*textureWide);
+		float right		= left+(itemWidthInPixels*2-2)/(2*textureWide);
+		float top		= (2*col*itemHeightInPixels+1)/(2*textureHigh);
+		float bottom	= top+(itemHeightInPixels*2-2)/(2*textureHigh);
 #else
-		float left		= row*itemWidth_/textureWide;
-		float right		= left+itemWidth_/textureWide;
-		float top		= col*itemHeight_/textureHigh;
-		float bottom	= top+itemHeight_/textureHigh;
+		float left		= row*itemWidthInPixels/textureWide;
+		float right		= left+itemWidthInPixels/textureWide;
+		float top		= col*itemHeightInPixels/textureHigh;
+		float bottom	= top+itemHeightInPixels/textureHigh;
 #endif // ! CC_FIX_ARTIFACTS_BY_STRECHING_TEXEL
 		
 		quad.tl.texCoords.u = left;
@@ -114,6 +124,11 @@
 		quad.tr.vertices.y = (int)(itemHeight_);
 		quad.tr.vertices.z = 0.0f;
 		
+		ccColor4B c = { color_.r, color_.g, color_.b, opacity_ };
+		quad.tl.colors = c;
+		quad.tr.colors = c;
+		quad.bl.colors = c;
+		quad.br.colors = c;
 		[textureAtlas_ updateQuad:&quad atIndex:i];
 	}
 }
@@ -130,10 +145,8 @@
 	string_ = [newString copy];
 	[self updateAtlasValues];
 
-	CGSize s;
-	s.width = len * itemWidth_;
-	s.height = itemHeight_;
-	[self setContentSizeInPixels:s];
+	CGSize s = CGSizeMake(len * itemWidth_, itemHeight_);
+	[self setContentSize:s];
 	
 	self.quadsToDraw = len;
 }
@@ -147,7 +160,7 @@
 
 #if CC_LABELATLAS_DEBUG_DRAW
 - (void) draw
-{
+{	
 	[super draw];
 
 	CGSize s = [self contentSize];
@@ -156,7 +169,6 @@
 		ccp(s.width,s.height),ccp(0,s.height),
 	};
 	ccDrawPoly(vertices, 4, YES);
-
 }
 #endif // CC_LABELATLAS_DEBUG_DRAW
 

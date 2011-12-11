@@ -62,10 +62,6 @@ Copyright (C) 2008 Apple Inc. All Rights Reserved.
 
 #import <Availability.h>
 
-#ifdef __IPHONE_OS_VERSION_MAX_ALLOWED
-#import <UIKit/UIKit.h>			// for UIImage
-#endif
-
 #import <Foundation/Foundation.h> //	for NSObject
 
 #import "ccTypes.h"
@@ -106,7 +102,8 @@ typedef enum {
 	
 } CCTexture2DPixelFormat;
 
-//CLASS INTERFACES:
+
+@class GLProgram;
 
 /** CCTexture2D class.
  * This class allows to easily create OpenGL 2D textures from images, text or raw data.
@@ -128,6 +125,9 @@ typedef enum {
 #ifdef __IPHONE_OS_VERSION_MAX_ALLOWED
 	ccResolutionType			resolutionType_;
 #endif
+	
+	// needed for drawAtRect, drawInPoint
+	GLProgram					*shaderProgram_;
 
 }
 /** Intializes with a texture2d with data */
@@ -156,6 +156,9 @@ typedef enum {
 @property(nonatomic,readwrite) GLfloat maxT;
 /** whether or not the texture has their Alpha premultiplied */
 @property(nonatomic,readonly) BOOL hasPremultipliedAlpha;
+
+/** shader program used by drawAtPoint and drawInRect */
+@property(nonatomic,readwrite,retain) GLProgram *shaderProgram;
 
 #ifdef __IPHONE_OS_VERSION_MAX_ALLOWED
 /** Returns the resolution type of the texture.
@@ -191,10 +194,9 @@ Extensions to make it easy to create a CCTexture2D object from an image file.
 Note that RGBA type textures will have their alpha premultiplied - use the blending mode (GL_ONE, GL_ONE_MINUS_SRC_ALPHA).
 */
 @interface CCTexture2D (Image)
-/** Initializes a texture from a UIImage object */
+/** Initializes a texture from a CGImage object */
 #ifdef __IPHONE_OS_VERSION_MAX_ALLOWED
-- (id) initWithImage:(UIImage *)uiImage resolutionType:(ccResolutionType)resolution;
-- (id) initWithImage:(UIImage *)uiImage DEPRECATED_ATTRIBUTE;
+- (id) initWithImage:(CGImageRef)cgImage resolutionType:(ccResolutionType)resolution;
 #elif defined(__MAC_OS_X_VERSION_MAX_ALLOWED)
 - (id) initWithImage:(CGImageRef)cgImage;
 #endif
@@ -224,15 +226,6 @@ Note that the generated textures are of type A8 - use the blending mode (GL_SRC_
  Note that the generated textures don't have their alpha premultiplied - use the blending mode (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA).
  */
 @interface CCTexture2D (PVRSupport)
-/** Initializes a texture from a PVR Texture Compressed (PVRTC) buffer
- *
- * IMPORTANT: This method is only defined on iOS. It is not supported on the Mac version.
- * 
- * @deprecated Use initWithPVRFile instead. Will be removed in 2.0
- */
-#ifdef __IPHONE_OS_VERSION_MAX_ALLOWED
--(id) initWithPVRTCData: (const void*)data level:(int)level bpp:(int)bpp hasAlpha:(BOOL)hasAlpha length:(int)length pixelFormat:(CCTexture2DPixelFormat)pixelFormat;
-#endif // __IPHONE_OS_VERSION_MAX_ALLOWED
 /** Initializes a texture from a PVR file.
  
  Supported PVR formats:
@@ -310,8 +303,8 @@ typedef struct _ccTexParams {
 @end
 
 @interface CCTexture2D (PixelFormat)
-/** sets the default pixel format for UIImages that contains alpha channel.
- If the UIImage contains alpha channel, then the options are:
+/** sets the default pixel format for CGImages that contains alpha channel.
+ If the CGImage contains alpha channel, then the options are:
 	- generate 32-bit textures: kCCTexture2DPixelFormat_RGBA8888 (default one)
 	- generate 16-bit textures: kCCTexture2DPixelFormat_RGBA4444
 	- generate 16-bit textures: kCCTexture2DPixelFormat_RGB5A1

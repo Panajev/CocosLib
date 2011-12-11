@@ -33,7 +33,9 @@
 #import "CCTexture2D.h"
 #import "CCProtocols.h"
 #import "ccConfig.h"
+#import "ccGLState.h"
 #import "Support/CCArray.h"
+#import "kazmath/kazmath.h"
 
 enum {
 	kCCNodeTagInvalid = -1,
@@ -41,6 +43,7 @@ enum {
 
 @class CCCamera;
 @class CCGridBase;
+@class GLProgram;
 
 /** CCNode is the main element. Anything thats gets drawn or contains things that get drawn is a CCNode.
  The most popular CCNodes are: CCScene, CCLayer, CCSprite, CCMenu.
@@ -82,13 +85,15 @@ enum {
  Order in transformations with grid disabled
  -# The node will be translated (position)
  -# The node will be rotated (rotation)
- -# The node will be scaled (scale)
+ -# The node will be skewed (skewX, skewY)
+ -# The node will be scaled (scale, scaleX, scaleY)
  -# The node will be moved according to the camera values (camera)
  
  Order in transformations with grid enabled
  -# The node will be translated (position)
  -# The node will be rotated (rotation)
- -# The node will be scaled (scale)
+ -# The node will be skewed (skewX, skewY)
+ -# The node will be scaled (scale, scaleX, scaleY)
  -# The grid will capture the screen
  -# The node will be moved according to the camera values (camera)
  -# The grid will render the captured screen
@@ -104,38 +109,26 @@ enum {
 	// scaling factors
 	float scaleX_, scaleY_;
 	
-	// position of the node
-	CGPoint position_;
-	CGPoint	positionInPixels_;
-	
-	// skew angles
-	float skewX_, skewY_;
-
-	// is visible
-	BOOL visible_;
-	
-	// anchor point in pixels
-	CGPoint anchorPointInPixels_;	
-	// anchor point normalized
-	CGPoint anchorPoint_;	
-	// If YES the transformtions will be relative to (-transform.x, -transform.y).
-	// Sprites, Labels and any other "small" object uses it.
-	// Scenes, Layers and other "whole screen" object don't use it.
-	BOOL isRelativeAnchorPoint_;
-	
-	// untransformed size of the node
-	CGSize	contentSize_;
-	CGSize	contentSizeInPixels_;
-	
-	// transform
-	CGAffineTransform transform_, inverse_;
-#if	CC_NODE_TRANSFORM_USING_AFFINE_MATRIX
-	GLfloat	transformGL_[16];
-#endif
-
 	// openGL real Z vertex
 	float vertexZ_;
 	
+	// position of the node
+	CGPoint position_;
+
+	// skew angles
+	float skewX_, skewY_;
+	
+	// anchor point in points
+	CGPoint anchorPointInPoints_;	
+	// anchor point normalized (NOT in points)
+	CGPoint anchorPoint_;	
+	
+	// untransformed size of the node
+	CGSize	contentSize_;
+	
+	// transform
+	CGAffineTransform transform_, inverse_;
+
 	// a Camera
 	CCCamera *camera_;
 	
@@ -156,23 +149,34 @@ enum {
     
 	// user data field
 	void *userData_;
+	
+	// Shader
+	GLProgram	*shaderProgram_;
+	
+	// Server side state
+	ccGLServerState glServerState_;
 
 	// Is running
-	BOOL isRunning_;
+	BOOL isRunning_:1;
 	
-	//used to preserve sequence while sorting children with the same zOrder
+	// used to preserve sequence while sorting children with the same zOrder
 	NSUInteger orderOfArrival_;
 
 	// To reduce memory, place BOOLs that are not properties here:
 	BOOL isTransformDirty_:1;
 	BOOL isInverseDirty_:1;
+
+	// is visible
+	BOOL visible_:1;
+	// If YES the transformtions will be relative to (-transform.x, -transform.y).
+	// Sprites, Labels and any other "small" object uses it.
+	// Scenes, Layers and other "whole screen" object don't use it.
+	BOOL isRelativeAnchorPoint_:1;
+
 	BOOL isReorderChildDirty_:1;
-#if	CC_NODE_TRANSFORM_USING_AFFINE_MATRIX
-	BOOL isTransformGLDirty_:1;
-#endif
 }
 
-/** The z order of the node relative to it's "brothers": children of the same parent */
+/** The z order of the node relative to its "siblings": children of the same parent */
 @property(nonatomic,readonly) NSInteger zOrder;
 /** The real openGL Z vertex.
  Differences between openGL Z vertex and cocos2d Z order:
@@ -207,10 +211,7 @@ enum {
 @property(nonatomic,readwrite,assign) float scaleY;
 /** Position (x,y) of the node in points. (0,0) is the left-bottom corner. */
 @property(nonatomic,readwrite,assign) CGPoint position;
-/** Position (x,y) of the node in points. (0,0) is the left-bottom corner. */
-@property(nonatomic,readwrite,assign) CGPoint positionInPixels;
-/** A CCCamera object that lets you move the node using a gluLookAt
-*/
+/** A CCCamera object that lets you move the node using a gluLookAt */
 @property(nonatomic,readonly) CCCamera* camera;
 /** Array of children */
 @property(nonatomic,readonly) CCArray *children;
@@ -229,7 +230,7 @@ enum {
 /** The anchorPoint in absolute pixels.
  Since v0.8 you can only read it. If you wish to modify it, use anchorPoint instead
  */
-@property(nonatomic,readonly) CGPoint anchorPointInPixels;
+@property(nonatomic,readonly) CGPoint anchorPointInPoints;
 
 /** The untransformed size of the node in Points
  The contentSize remains the same no matter the node is scaled or rotated.
@@ -238,18 +239,11 @@ enum {
  */
 @property (nonatomic,readwrite) CGSize contentSize;
 
-/** The untransformed size of the node in Pixels
- The contentSize remains the same no matter the node is scaled or rotated.
- All nodes has a size. Layer and Scene has the same size of the screen.
- @since v0.8
- */
-@property (nonatomic,readwrite) CGSize contentSizeInPixels;
-
 /** whether or not the node is running */
 @property(nonatomic,readonly) BOOL isRunning;
 /** A weak reference to the parent */
 @property(nonatomic,readwrite,assign) CCNode* parent;
-/** If YES the transformtions will be relative to it's anchor point.
+/** If YES the transformtions will be relative to its anchor point.
  * Sprites, Labels and any other sizeble object use it have it enabled by default.
  * Scenes, Layers and other "whole screen" object don't use it, have it disabled by default.
  */
@@ -258,9 +252,18 @@ enum {
 @property(nonatomic,readwrite,assign) NSInteger tag;
 /** A custom user data pointer */
 @property(nonatomic,readwrite,assign) void *userData;
+/** Shader Program
+ @since v2.0
+ */
+@property(nonatomic,readwrite,retain) GLProgram *shaderProgram;
 
 /** used internally for zOrder sorting, don't change this manually */
 @property(nonatomic,readwrite) NSUInteger orderOfArrival;
+
+/** GL server side state
+ @since v2.0
+*/
+@property (nonatomic, readwrite) ccGLServerState glServerState;
 
 // initializators
 /** allocates and initializes a node.
@@ -357,17 +360,11 @@ enum {
 // draw
 
 /** Override this method to draw your own node.
- The following GL states will be enabled by default:
-	- glEnableClientState(GL_VERTEX_ARRAY);
-	- glEnableClientState(GL_COLOR_ARRAY);
-	- glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-	- glEnable(GL_TEXTURE_2D);
- 
-   AND YOU SHOULD NOT DISABLE THEM AFTER DRAWING YOUR NODE
- 
- But if you enable any other GL state, you should disable it after drawing your node.
+ You should use cocos2d's GL API to enable/disable the GL state / shaders.
+ For further info, please see ccGLstate.h 
  */
 -(void) draw;
+
 /** recursive method that visit its children and draw them */
 -(void) visit;
 
@@ -376,9 +373,8 @@ enum {
 /** performs OpenGL view-matrix transformation based on position, scale, rotation and other attributes. */
 -(void) transform;
 
-/** performs OpenGL view-matrix transformation of it's ancestors.
- Generally the ancestors are already transformed, but in certain cases (eg: attaching a FBO)
- it's necessary to transform the ancestors again.
+/** performs OpenGL view-matrix transformation of its ancestors.
+ Generally the ancestors are already transformed, but in certain cases (eg: attaching a FBO) it is necessary to transform the ancestors again.
  @since v0.7.2
  */
 -(void) transformAncestors;
@@ -390,15 +386,6 @@ enum {
  @since v0.8.2
  */
 - (CGRect) boundingBox;
-
-/** returns a "local" axis aligned bounding box of the node in pixels.
- The returned box is relative only to its parent.
- The returned box is in Points.
- 
- @since v0.99.5
- */
-- (CGRect) boundingBoxInPixels;
-
 
 // actions
 

@@ -57,12 +57,7 @@
 	ccBlendFunc		blendFunc_;
 
 	// all descendants: chlidren, gran children, etc...
-	CCArray	*descendants_;
-	
-	@private
-	
-	void (*updateAtlasIndexMethod_)(id, SEL,CCSprite*,NSInteger*);
-	
+	CCArray	*descendants_;	
 }
 
 /** returns the TextureAtlas that is used */

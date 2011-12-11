@@ -47,7 +47,7 @@
 	NSUInteger		itemsPerRow_;
 	// chars per column
 	NSUInteger		itemsPerColumn_;
-		
+	
 	// width of each char
 	NSUInteger		itemWidth_;
 	// height of each char
@@ -64,6 +64,9 @@
 	ccColor3B	color_;
 	ccColor3B	colorUnmodified_;
 	BOOL opacityModifyRGB_;
+	
+	// color uniform
+	GLint	uniformColor_;
 }
 
 /** conforms to CCTextureProtocol protocol */

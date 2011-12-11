@@ -31,7 +31,7 @@
 #import "CCTextureCache.h"
 
 @implementation CCAnimation
-@synthesize name = name_, delay = delay_, frames = frames_;
+@synthesize delay = delay_, frames = frames_;
 
 +(id) animation
 {
@@ -79,7 +79,6 @@
 -(void) dealloc
 {
 	CCLOGINFO( @"cocos2d: deallocing %@",self);
-	[name_ release];
 	[frames_ release];
 	[super dealloc];
 }

@@ -32,6 +32,10 @@
 #import "CCLayer.h"
 #import "CCDirector.h"
 #import "ccMacros.h"
+#import "CCShaderCache.h"
+#import "GLProgram.h"
+#import "ccGLState.h"
+#import "Support/TransformUtils.h"
 #import "Support/CGPointExtension.h"
 
 #ifdef __IPHONE_OS_VERSION_MAX_ALLOWED
@@ -40,6 +44,9 @@
 #elif defined(__MAC_OS_X_VERSION_MAX_ALLOWED)
 #import "Platforms/Mac/CCEventDispatcher.h"
 #endif
+
+// extern
+#import "kazmath/GL/matrix.h"
 
 #pragma mark -
 #pragma mark Layer
@@ -298,8 +305,8 @@
 	if( (self=[super init]) ) {
 		
 		// default blend function
-		blendFunc_ = (ccBlendFunc) { CC_BLEND_SRC, CC_BLEND_DST };
-
+		blendFunc_ = (ccBlendFunc) { GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA };
+		
 		color_.r = color.r;
 		color_.g = color.g;
 		color_.b = color.b;
@@ -312,6 +319,8 @@
 				
 		[self updateColor];
 		[self setContentSize:CGSizeMake(w, h) ];
+		
+		self.shaderProgram = [[CCShaderCache sharedShaderCache] programForKey:kCCShader_PositionColor];
 	}
 	return self;
 }
@@ -325,10 +334,10 @@
 // override contentSize
 -(void) setContentSize: (CGSize) size
 {
-	squareVertices_[1].x = size.width * CC_CONTENT_SCALE_FACTOR();
-	squareVertices_[2].y = size.height * CC_CONTENT_SCALE_FACTOR();
-	squareVertices_[3].x = size.width * CC_CONTENT_SCALE_FACTOR();
-	squareVertices_[3].y = size.height * CC_CONTENT_SCALE_FACTOR();
+	squareVertices_[1].x = size.width;
+	squareVertices_[2].y = size.height;
+	squareVertices_[3].x = size.width;
+	squareVertices_[3].y = size.height;
 	
 	[super setContentSize:size];
 }
@@ -352,44 +361,28 @@
 {
 	for( NSUInteger i = 0; i < 4; i++ )
 	{
-		squareColors_[i].r = color_.r;
-		squareColors_[i].g = color_.g;
-		squareColors_[i].b = color_.b;
-		squareColors_[i].a = opacity_;
+		squareColors_[i].r = color_.r / 255.0f;
+		squareColors_[i].g = color_.g / 255.0f;
+		squareColors_[i].b = color_.b / 255.0f;
+		squareColors_[i].a = opacity_ / 255.0f;
 	}
 }
 
-- (void)draw
-{		
-	[super draw];
+- (void) draw
+{
+	CC_NODE_DRAW_SETUP();
 
-	// Default GL states: GL_TEXTURE_2D, GL_VERTEX_ARRAY, GL_COLOR_ARRAY, GL_TEXTURE_COORD_ARRAY
-	// Needed states: GL_VERTEX_ARRAY, GL_COLOR_ARRAY
-	// Unneeded states: GL_TEXTURE_2D, GL_TEXTURE_COORD_ARRAY
-	glDisableClientState(GL_TEXTURE_COORD_ARRAY);
-	glDisable(GL_TEXTURE_2D);
+	ccGLEnableVertexAttribs( kCCVertexAttribFlag_Position | kCCVertexAttribFlag_Color );
 
-	glVertexPointer(2, GL_FLOAT, 0, squareVertices_);
-	glColorPointer(4, GL_UNSIGNED_BYTE, 0, squareColors_);
+	//
+	// Attributes
+	//
+	glVertexAttribPointer(kCCVertexAttrib_Position, 2, GL_FLOAT, GL_FALSE, 0, squareVertices_);
+	glVertexAttribPointer(kCCVertexAttrib_Color, 4, GL_FLOAT, GL_FALSE, 0, squareColors_);
+
+	ccGLBlendFunc( blendFunc_.src, blendFunc_.dst );
 	
-	
-	BOOL newBlend = blendFunc_.src != CC_BLEND_SRC || blendFunc_.dst != CC_BLEND_DST;
-	if( newBlend )
-		glBlendFunc( blendFunc_.src, blendFunc_.dst );
-	
-	else if( opacity_ != 255 ) {
-		newBlend = YES;
-		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	}
-	
-	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-	
-	if( newBlend )
-		glBlendFunc(CC_BLEND_SRC, CC_BLEND_DST);
-	
-	// restore default GL state
-	glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-	glEnable(GL_TEXTURE_2D);
+	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);	
 }
 
 #pragma mark Protocols
@@ -457,7 +450,7 @@
     if (h == 0)
 		return;
 
-	double c = sqrt(2);
+	float c = sqrtf(2);
     CGPoint u = ccp(vector_.x / h, vector_.y / h);
 
 	// Compressed Interpolation mode
@@ -468,18 +461,18 @@
 	
 	float opacityf = (float)opacity_/255.0f;
 	
-    ccColor4B S = {
-		color_.r,
-		color_.g,
-		color_.b,
-		startOpacity_*opacityf
+    ccColor4F S = {
+		color_.r / 255.0f,
+		color_.g / 255.0f,
+		color_.b / 255.0f,
+		startOpacity_*opacityf / 255.0f,
 	};
 
-    ccColor4B E = {
-		endColor_.r,
-		endColor_.g,
-		endColor_.b,
-		endOpacity_*opacityf
+    ccColor4F E = {
+		endColor_.r / 255.0f,
+		endColor_.g / 255.0f,
+		endColor_.b / 255.0f,
+		endOpacity_*opacityf / 255.0f,
 	};
 
 
@@ -617,4 +610,3 @@
 	[self addChild: [layers_ objectAtIndex:n]];		
 }
 @end
-

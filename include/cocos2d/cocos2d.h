@@ -39,8 +39,8 @@
  */
 
 // 0x00 HI ME LO
-// 00   01 01 00
-#define COCOS2D_VERSION 0x00010100
+// 00   02 00 00
+#define COCOS2D_VERSION 0x00020000
 
 #import <Availability.h>
 
@@ -75,7 +75,6 @@
 #import "CCLabelAtlas.h"
 
 #import "CCParticleSystem.h"
-#import "CCParticleSystemPoint.h"
 #import "CCParticleSystemQuad.h"
 #import "CCParticleExamples.h"
 #import "CCParticleBatchNode.h"
@@ -114,6 +113,11 @@
 #import "CCMotionStreak.h"
 #import "CCConfiguration.h"
 
+// Shaders
+#import "GLProgram.h"
+#import "ccGLState.h"
+#import "CCShaderCache.h"
+
 //
 // cocos2d macros
 //
@@ -146,10 +150,15 @@
 #import "Support/ccCArray.h"
 #import "Support/CCArray.h"
 #import "Support/ccUtils.h"
-
-#if CC_ENABLE_PROFILERS
+#import "Support/TransformUtils.h"
 #import "Support/CCProfiling.h"
-#endif // CC_ENABLE_PROFILERS
+
+//
+// external
+//
+#import "kazmath/kazmath.h"
+#import "kazmath/GL/matrix.h"
+
 
 
 // free functions

@@ -65,7 +65,7 @@ enum {
  - Layer name
  - Layer size
  - Layer opacity at creation time (it can be modified at runtime)
- - Whether the layer is visible (if it's not visible, then the CocosNode won't be created)
+ - Whether the layer is visible (if it is not visible, then the CCNode won't be created)
  
  This information is obtained from the TMX file.
  */
@@ -164,6 +164,9 @@ enum {
 	// tmx filename
 	NSString *filename_;
 
+	// tmx resource path
+	NSString *resources_;
+	
 	// map orientation
 	int	orientation_;	
 	
@@ -195,13 +198,22 @@ enum {
 @property (nonatomic,readwrite,retain) NSMutableArray *layers;
 @property (nonatomic,readwrite,retain) NSMutableArray *tilesets;
 @property (nonatomic,readwrite,retain) NSString *filename;
+@property (nonatomic,readwrite,retain) NSString *resources;
 @property (nonatomic,readwrite,retain) NSMutableArray *objectGroups;
 @property (nonatomic,readwrite,retain) NSMutableDictionary *properties;
 @property (nonatomic,readwrite,retain) NSMutableDictionary *tileProperties;
 
 /** creates a TMX Format with a tmx file */
 +(id) formatWithTMXFile:(NSString*)tmxFile;
-/** initializes a TMX format witha  tmx file */
+
+/** creates a TMX Format with an XML string and a TMX resource path */
++(id) formatWithXML:(NSString*)tmxString resourcePath:(NSString*)resourcePath;
+
+/** initializes a TMX format with a tmx file */
 -(id) initWithTMXFile:(NSString*)tmxFile;
+
+/** initializes a TMX format with an XML string and a TMX resource path */
+-(id) initWithXML:(NSString*)tmxString resourcePath:(NSString*)resourcePath;
+
 @end
 

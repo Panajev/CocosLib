@@ -31,6 +31,8 @@
 #import "ccGLState.h"
 #import "Support/ccUtils.h"
 #import "Support/CCFileUtils.h"
+#import "ccConfig.h"
+#import "CCConfiguration.h"
 
 // extern
 #import "kazmath/GL/matrix.h"
@@ -63,12 +65,25 @@
 		
 		w *= CC_CONTENT_SCALE_FACTOR();
 		h *= CC_CONTENT_SCALE_FACTOR();
-
+        
 		glGetIntegerv(CC_GL_FRAMEBUFFER_BINDING, &oldFBO_);
 		
-		// textures must be power of two
-		NSUInteger powW = ccNextPOT(w);
-		NSUInteger powH = ccNextPOT(h);
+        NSUInteger powW, powH;
+        
+        CCConfiguration *conf = [CCConfiguration sharedConfiguration];
+        
+        if( [conf supportsNPOT] ) {
+            NSLog (@"NPOT path... %s", __PRETTY_FUNCTION__);
+            powW = w;
+            powH = h;
+        } else
+        {
+            // textures must be power of two
+            NSLog (@"normal path... %s", __PRETTY_FUNCTION__);
+            powW = ccNextPOT(w);
+            powH = ccNextPOT(h);
+        }
+        
 		
 		void *data = malloc((int)(powW * powH * 4));
 		memset(data, 0, (int)(powW * powH * 4));
@@ -76,14 +91,14 @@
 		
 		texture_ = [[CCTexture2D alloc] initWithData:data pixelFormat:pixelFormat_ pixelsWide:powW pixelsHigh:powH contentSize:CGSizeMake(w, h)];
 		free( data );
-    
+        
 		// generate FBO
 		glGenFramebuffers(1, &fbo_);
 		glBindFramebuffer(CC_GL_FRAMEBUFFER, fbo_);
-    
+        
 		// associate texture with FBO
 		glFramebufferTexture2D(CC_GL_FRAMEBUFFER, CC_GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, texture_.name, 0);
-    
+        
 		// check if it worked (probably worth doing :) )
 		GLuint status = glCheckFramebufferStatus(CC_GL_FRAMEBUFFER);
 		if (status != CC_GL_FRAMEBUFFER_COMPLETE)
@@ -97,10 +112,10 @@
 		[texture_ release];
 		[sprite_ setScaleY:-1];
 		[self addChild:sprite_];
-
+        
 		// issue #937
 		[sprite_ setBlendFunc:(ccBlendFunc){GL_ONE, GL_ONE_MINUS_SRC_ALPHA}];
-
+        
 		glBindFramebuffer(CC_GL_FRAMEBUFFER, oldFBO_);
 	}
 	return self;
@@ -147,14 +162,14 @@
 -(void)beginWithClear:(float)r g:(float)g b:(float)b a:(float)a
 {
 	[self begin];
-
+    
 	// save clear color
 	GLfloat	clearColor[4];
 	glGetFloatv(GL_COLOR_CLEAR_VALUE,clearColor); 
-
+    
 	glClearColor(r, g, b, a);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
+    
 	// restore clear color
 	glClearColor(clearColor[0], clearColor[1], clearColor[2], clearColor[3]);
 }
@@ -162,16 +177,16 @@
 -(void)end
 {
 	glBindFramebuffer(CC_GL_FRAMEBUFFER, oldFBO_);
-
+    
 	kmGLPopMatrix();
-
+    
 	CCDirector *director = [CCDirector sharedDirector];
-
+    
 	CGSize size = [director winSizeInPixels];
-
+    
 	// restore viewport
 	glViewport(0, 0, size.width * CC_CONTENT_SCALE_FACTOR(), size.height * CC_CONTENT_SCALE_FACTOR() );
-
+    
 	// special viewport for 3d projection + retina display
 	if ( director.projection == kCCDirectorProjection3D && CC_CONTENT_SCALE_FACTOR() != 1 )
 		glViewport(-size.width/2, -size.height/2, size.width * CC_CONTENT_SCALE_FACTOR(), size.height * CC_CONTENT_SCALE_FACTOR() );
@@ -217,7 +232,7 @@
 	
 	GLubyte *buffer	= calloc(myDataLength,1);
 	GLubyte *pixels	= calloc(myDataLength,1);
-
+    
 	
 	if( ! (buffer && pixels) ) {
 		CCLOG(@"cocos2d: CCRenderTexture#getUIImageFromBuffer: not enough memory");

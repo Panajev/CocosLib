@@ -75,7 +75,7 @@
 #import "CCLabelAtlas.h"
 
 #import "CCParticleSystem.h"
-#import "CCParticleSystemQuad.h"
+#import "CCParticleSystemQuad.h" 
 #import "CCParticleBatchNode.h"
 
 #import "CCTexture2D.h"

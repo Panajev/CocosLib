@@ -141,25 +141,10 @@ void b2Body::SetType(b2BodyType type)
 	m_force.SetZero();
 	m_torque = 0.0f;
 
-	// Delete the attached contacts.
-	b2ContactEdge* ce = m_contactList;
-	while (ce)
-	{
-		b2ContactEdge* ce0 = ce;
-		ce = ce->next;
-		m_world->m_contactManager.Destroy(ce0->contact);
-	}
-	m_contactList = NULL;
-
-	// Touch the proxies so that new contacts will be created (when appropriate)
-	b2BroadPhase* broadPhase = &m_world->m_contactManager.m_broadPhase;
+	// Since the body type changed, we need to flag contacts for filtering.
 	for (b2Fixture* f = m_fixtureList; f; f = f->m_next)
 	{
-		int32 proxyCount = f->m_proxyCount;
-		for (int32 i = 0; i < proxyCount; ++i)
-		{
-			broadPhase->TouchProxy(f->m_proxies[i].proxyId);
-		}
+		f->Refilter();
 	}
 }
 

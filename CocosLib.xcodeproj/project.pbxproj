@@ -1884,6 +1884,10 @@
 		E6E2A63412CE48E000923828 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ARCHS = (
+					"$(ARCHS_UNIVERSAL_IPHONE_OS)",
+					armv6,
+				);
 				CLANG_CXX_LIBRARY = "libstdc++";
 				COPY_PHASE_STRIP = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
@@ -1984,6 +1988,10 @@
 		E6E2A9A812CE52DE00923828 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ARCHS = (
+					"$(ARCHS_UNIVERSAL_IPHONE_OS)",
+					armv6,
+				);
 				CLANG_CXX_LIBRARY = "libstdc++";
 				COPY_PHASE_STRIP = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";

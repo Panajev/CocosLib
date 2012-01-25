@@ -77,7 +77,7 @@
 #import "ccMacros.h"
 #import "CCConfiguration.h"
 #import "CCTexturePVR.h"
-#import "GLProgram.h"
+#import "CCGLProgram.h"
 #import "ccGLState.h"
 #import "CCShaderCache.h"
 
@@ -221,9 +221,9 @@ static CCTexture2DPixelFormat defaultAlphaPixelFormat_ = kCCTexture2DPixelFormat
 @implementation CCTexture2D (Image)
 
 #ifdef __CC_PLATFORM_IOS
-- (id) initWithImage:(CGImageRef)cgImage resolutionType:(ccResolutionType)resolution
+- (id) initWithCGImage:(CGImageRef)cgImage resolutionType:(ccResolutionType)resolution
 #elif defined(__CC_PLATFORM_MAC)
-- (id) initWithImage:(CGImageRef)cgImage
+- (id) initWithCGImage:(CGImageRef)cgImage
 #endif
 {
 	NSUInteger				POTWide, POTHigh;

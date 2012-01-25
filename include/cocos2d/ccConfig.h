@@ -28,10 +28,6 @@
  cocos2d (cc) configuration file
 */
 
-#ifndef DEBUG
-#define DEBUG 0
-#endif
-
 /** @def CC_ENABLE_GL_STATE_CACHE
  If enabled, cocos2d will maintain an OpenGL state cache internally to avoid unnecessary switches.
  In order to use them, you have to use the following functions, insead of the the GL ones:
@@ -47,7 +43,7 @@
  @since v2.0.0
  */
 #ifndef CC_ENABLE_GL_STATE_CACHE
-#define CC_ENABLE_GL_STATE_CACHE 1
+#define CC_ENABLE_GL_STATE_CACHE 0
 #endif
 
 /** @def CC_FIX_ARTIFACTS_BY_STRECHING_TEXEL
@@ -209,5 +205,5 @@
  To enable set it to a value different than 0. Disabled by default.
  */
 #ifndef CC_ENABLE_PROFILERS
-#define CC_ENABLE_PROFILERS (DEBUG)
+#define CC_ENABLE_PROFILERS 0
 #endif

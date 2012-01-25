@@ -83,19 +83,15 @@ static CCTextureCache *sharedTextureCache;
 		_loadingQueue = dispatch_queue_create("org.cocos2d.texturecacheloading", NULL);
 		_dictQueue = dispatch_queue_create("org.cocos2d.texturecachedict", NULL);
 
-#ifdef __CC_PLATFORM_IOS
-		CC_GLVIEW *view = (CC_GLVIEW*)[[CCDirector sharedDirector] view];
+		CCGLView *view = (CCGLView*)[[CCDirector sharedDirector] view];
 		NSAssert(view, @"Do not initialize the TextureCache before the Director");
+
+#ifdef __CC_PLATFORM_IOS
 		_auxGLcontext = [[EAGLContext alloc]
 						 initWithAPI:kEAGLRenderingAPIOpenGLES2
 						 sharegroup:[[view context] sharegroup]];
 
 #elif defined(__CC_PLATFORM_MAC)
-
-		MacGLView *view = (CC_GLVIEW*)[[CCDirector sharedDirector] view];
-		NSAssert(view, @"Do not initialize the TextureCache before the Director");
-
-
 		NSOpenGLPixelFormat *pf = [view pixelFormat];
 		NSOpenGLContext *share = [view openGLContext];
 
@@ -292,12 +288,12 @@ static CCTextureCache *sharedTextureCache;
 	if( ! tex ) {
 
 		NSString *lowerCase = [path lowercaseString];
-		// all images are handled by UIImage except PVR extension that is handled by our own handler
+
+		// all images are handled by UIKit/AppKit except PVR extension that is handled by cocos2d's handler
 
 		if ( [lowerCase hasSuffix:@".pvr"] || [lowerCase hasSuffix:@".pvr.gz"] || [lowerCase hasSuffix:@".pvr.ccz"] )
 			tex = [self addPVRImage:path];
 
-		// Only iPhone
 #ifdef __CC_PLATFORM_IOS
 
 		// Issue #886: TEMPORARY FIX FOR TRANSPARENT JPEGS IN IOS4
@@ -309,11 +305,11 @@ static CCTextureCache *sharedTextureCache;
 			CCLOG(@"cocos2d: WARNING: Loading JPEG image. For faster loading times, convert it to PVR or PNG");
 
 			ccResolutionType resolution;
-			NSString *fullpath = [CCFileUtils fullPathFromRelativePath: path resolutionType:&resolution];
+			NSString *fullpath = [CCFileUtils fullPathFromRelativePath:path resolutionType:&resolution];
 
 			UIImage *jpg = [[UIImage alloc] initWithContentsOfFile:fullpath];
 			UIImage *png = [[UIImage alloc] initWithData:UIImagePNGRepresentation(jpg)];
-			tex = [ [CCTexture2D alloc] initWithImage:png.CGImage resolutionType:resolution];
+			tex = [ [CCTexture2D alloc] initWithCGImage:png.CGImage resolutionType:resolution];
 			[png release];
 			[jpg release];
 
@@ -334,8 +330,8 @@ static CCTextureCache *sharedTextureCache;
 			ccResolutionType resolution;
 			NSString *fullpath = [CCFileUtils fullPathFromRelativePath:path resolutionType:&resolution];
 
-			UIImage *image = [ [UIImage alloc] initWithContentsOfFile: fullpath ];
-			tex = [ [CCTexture2D alloc] initWithImage:image.CGImage resolutionType:resolution];
+			UIImage *image = [[UIImage alloc] initWithContentsOfFile:fullpath];
+			tex = [[CCTexture2D alloc] initWithCGImage:image.CGImage resolutionType:resolution];
 			[image release];
 
 			if( tex ){
@@ -351,14 +347,13 @@ static CCTextureCache *sharedTextureCache;
 		}
 
 
-		// Only in Mac
 #elif defined(__CC_PLATFORM_MAC)
 		else {
 			NSString *fullpath = [CCFileUtils fullPathFromRelativePath: path ];
 
 			NSData *data = [[NSData alloc] initWithContentsOfFile:fullpath];
 			NSBitmapImageRep *image = [[NSBitmapImageRep alloc] initWithData:data];
-			tex = [ [CCTexture2D alloc] initWithImage:[image CGImage]];
+			tex = [ [CCTexture2D alloc] initWithCGImage:[image CGImage]];
 
 			[data release];
 			[image release];
@@ -374,7 +369,6 @@ static CCTextureCache *sharedTextureCache;
 			// autorelease prevents possible crash in multithreaded environments
 			[tex autorelease];
 		}
-
 #endif // __CC_PLATFORM_MAC
 
 	}
@@ -399,13 +393,9 @@ static CCTextureCache *sharedTextureCache;
 	}
 
 #ifdef __CC_PLATFORM_IOS
-	// prevents overloading the autorelease pool
-	UIImage *image = [[UIImage alloc] initWithCGImage:imageref];
-	tex = [[CCTexture2D alloc] initWithImage:image.CGImage resolutionType:kCCResolutionUnknown];
-	[image release];
-
-#elif defined(__CC_PLATFORM_MAC)
-	tex = [[CCTexture2D alloc] initWithImage: imageref];
+	tex = [[CCTexture2D alloc] initWithCGImage:imageref resolutionType:kCCResolutionUnknown];
+#elif __CC_PLATFORM_MAC
+	tex = [[CCTexture2D alloc] initWithCGImage:imageref];
 #endif
 
 	if(tex && key){

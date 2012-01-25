@@ -31,12 +31,12 @@
 #import "../../ccMacros.h"
 #ifdef __CC_PLATFORM_IOS
 
-#import "ESRenderer.h"
+#import "CCESRenderer.h"
 
 #import <OpenGLES/ES2/gl.h>
 #import <OpenGLES/ES2/glext.h>
 
-@interface ES2Renderer : NSObject <ESRenderer>
+@interface CCES2Renderer : NSObject <CCESRenderer>
 {
     // The pixel dimensions of the CAEAGLLayer
     GLint backingWidth_;
@@ -61,11 +61,22 @@
 	EAGLContext *context_;
 }
 
+/** Color Renderbuffer */
+@property (nonatomic,readonly) GLuint colorRenderbuffer;
+
+/** Default Renderbuffer */
+@property (nonatomic,readonly) GLuint defaultFramebuffer;
+
+/** MSAA Framebuffer */
+@property (nonatomic,readonly) GLuint msaaFramebuffer;
+
+/** MSAA Color Buffer */
+@property (nonatomic,readonly) GLuint msaaColorbuffer;
+
 /** EAGLContext */
 @property (nonatomic,readonly) EAGLContext* context;
 
 - (BOOL)resizeFromLayer:(CAEAGLLayer *)layer;
-
 @end
 
 #endif // __CC_PLATFORM_IOS

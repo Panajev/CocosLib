@@ -29,7 +29,7 @@
 #import "CCTexture2D.h"
 #import "CCDirector.h"
 #import "CCGrabber.h"
-#import "GLProgram.h"
+#import "CCGLProgram.h"
 #import "CCShaderCache.h"
 #import "ccGLState.h"
 
@@ -103,11 +103,11 @@
 	unsigned long POTHigh = ccNextPOT(s.height);
 
 #ifdef __CC_PLATFORM_IOS
-	EAGLView *glview = (CC_GLVIEW*)[[CCDirector sharedDirector] view];
+	CCGLView *glview = (CCGLView*)[[CCDirector sharedDirector] view];
 	NSString *pixelFormat = [glview pixelFormat];
 
 	CCTexture2DPixelFormat format = [pixelFormat isEqualToString: kEAGLColorFormatRGB565] ? kCCTexture2DPixelFormat_RGB565 : kCCTexture2DPixelFormat_RGBA8888;
-#else
+#elif defined(__CC_PLATFORM_MAC)
 	CCTexture2DPixelFormat format = kCCTexture2DPixelFormat_RGBA8888;
 #endif
 
@@ -144,7 +144,7 @@
 {
 	CCLOGINFO(@"cocos2d: deallocing %@", self);
 
-	[self setActive: NO];
+//	[self setActive: NO];
 
 	[texture_ release];
 	[grabber_ release];
@@ -181,59 +181,37 @@
 }
 
 -(void)set2DProjection
-{
-	CGSize	winSize = [[CCDirector sharedDirector] winSizeInPixels];
-
-	kmGLLoadIdentity();
-	glViewport(0, 0, winSize.width * CC_CONTENT_SCALE_FACTOR(), winSize.height * CC_CONTENT_SCALE_FACTOR() );
-	kmGLMatrixMode(KM_GL_PROJECTION);
-	kmGLLoadIdentity();
-
-	kmMat4 orthoMatrix;
-	kmMat4OrthographicProjection(&orthoMatrix, 0, winSize.width * CC_CONTENT_SCALE_FACTOR(), 0, winSize.height * CC_CONTENT_SCALE_FACTOR(), -1024, 1024);
-	kmGLMultMatrix( &orthoMatrix );
-
-	kmGLMatrixMode(KM_GL_MODELVIEW);
-
-	ccSetProjectionMatrixDirty();
-}
-
--(void)set3DProjection
-{
+{	
 	CCDirector *director = [CCDirector sharedDirector];
 
-	CGSize	winSize = [director winSizeInPixels];
-	CGSize	winSizePoints = [director winSize];
-
-	if( CC_CONTENT_SCALE_FACTOR() != 1 )
-		glViewport(-winSize.width/2, -winSize.height/2, winSize.width * CC_CONTENT_SCALE_FACTOR(), winSize.height * CC_CONTENT_SCALE_FACTOR() );
-	else
-		glViewport(0, 0, winSize.width, winSize.height );
-
+	CGSize	size = [director winSizeInPixels];
+	
+	glViewport(0, 0, size.width * CC_CONTENT_SCALE_FACTOR(), size.height * CC_CONTENT_SCALE_FACTOR() );
 	kmGLMatrixMode(KM_GL_PROJECTION);
 	kmGLLoadIdentity();
-
-	kmMat4 matrixPerspective, matrixLookup;
-
-	kmMat4PerspectiveProjection( &matrixPerspective, 60, (GLfloat)winSizePoints.width/winSizePoints.height, 0.5f, 1500.0f );
-	kmGLMultMatrix( &matrixPerspective );
-
+	
+	kmMat4 orthoMatrix;
+	kmMat4OrthographicProjection(&orthoMatrix, 0, size.width * CC_CONTENT_SCALE_FACTOR(), 0, size.height * CC_CONTENT_SCALE_FACTOR(), -1, 1);
+	kmGLMultMatrix( &orthoMatrix );
+	
 	kmGLMatrixMode(KM_GL_MODELVIEW);
 	kmGLLoadIdentity();
-	kmVec3 eye, center, up;
-	kmVec3Fill( &eye, winSizePoints.width/2, winSizePoints.height/2, [director getZEye] );
-	kmVec3Fill( &center, winSizePoints.width/2, winSizePoints.height/2, 0 );
-	kmVec3Fill( &up,0,1,0);
-	kmMat4LookAt(&matrixLookup, &eye, &center, &up);
 
-	kmGLMultMatrix( &matrixLookup );
-
+	
 	ccSetProjectionMatrixDirty();
 }
 
 -(void)beforeDraw
 {
+	// save projection
+	CCDirector *director = [CCDirector sharedDirector];
+	directorProjection_ = [director projection];
+	
+	// 2d projection
+//	[director setProjection:kCCDirectorProjection2D];
 	[self set2DProjection];
+
+	
 	[grabber_ beforeRender:texture_];
 }
 
@@ -242,7 +220,9 @@
 {
 	[grabber_ afterRender:texture_];
 
-	[self set3DProjection];
+	// restore projection
+	CCDirector *director = [CCDirector sharedDirector];
+	[director setProjection: directorProjection_];
 
 	if( target.camera.dirty ) {
 
@@ -328,13 +308,15 @@
 	if (texCoordinates) free(texCoordinates);
 	if (indices) free(indices);
 	
-	vertices = malloc((gridSize_.x+1)*(gridSize_.y+1)*sizeof(ccVertex3F));
-	originalVertices = malloc((gridSize_.x+1)*(gridSize_.y+1)*sizeof(ccVertex3F));
-	texCoordinates = malloc((gridSize_.x+1)*(gridSize_.y+1)*sizeof(CGPoint));
-	indices = malloc(gridSize_.x*gridSize_.y*sizeof(GLushort)*6);
+	NSUInteger numOfPoints = (gridSize_.x+1) * (gridSize_.y+1);
+	
+	vertices = malloc(numOfPoints * sizeof(ccVertex3F));
+	originalVertices = malloc(numOfPoints * sizeof(ccVertex3F));
+	texCoordinates = malloc(numOfPoints * sizeof(ccVertex2F));
+	indices = malloc( (gridSize_.x * gridSize_.y) * sizeof(GLushort)*6);
 
-	float *vertArray = (float*)vertices;
-	float *texArray = (float*)texCoordinates;
+	GLfloat *vertArray = (GLfloat*)vertices;
+	GLfloat *texArray = (GLfloat*)texCoordinates;
 	GLushort *idxArray = (GLushort *)indices;
 
 	for( x = 0; x < gridSize_.x; x++ )
@@ -343,10 +325,10 @@
 		{
 			NSInteger idx = (y * gridSize_.x) + x;
 
-			float x1 = x * step_.x;
-			float x2 = x1 + step_.x;
-			float y1 = y * step_.y;
-			float y2 = y1 + step_.y;
+			GLfloat x1 = x * step_.x;
+			GLfloat x2 = x1 + step_.x;
+			GLfloat y1 = y * step_.y;
+			GLfloat y2 = y1 + step_.y;
 
 			GLushort a = x * (gridSize_.y+1) + y;
 			GLushort b = (x+1) * (gridSize_.y+1) + y;
@@ -476,13 +458,13 @@
 	if (texCoordinates) free(texCoordinates);
 	if (indices) free(indices);
 
-	vertices = malloc(numQuads*12*sizeof(GLfloat));
-	originalVertices = malloc(numQuads*12*sizeof(GLfloat));
-	texCoordinates = malloc(numQuads*8*sizeof(GLfloat));
+	vertices = malloc(numQuads*4*sizeof(ccVertex3F));
+	originalVertices = malloc(numQuads*4*sizeof(ccVertex3F));
+	texCoordinates = malloc(numQuads*4*sizeof(ccVertex2F));
 	indices = malloc(numQuads*6*sizeof(GLushort));
 
-	float *vertArray = (float*)vertices;
-	float *texArray = (float*)texCoordinates;
+	GLfloat *vertArray = (GLfloat*)vertices;
+	GLfloat *texArray = (GLfloat*)texCoordinates;
 	GLushort *idxArray = (GLushort *)indices;
 
 	int x, y;

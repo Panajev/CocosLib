@@ -42,7 +42,10 @@ enum  {
 };
 
 @interface CCDirector (MacExtension)
-/** converts an NSEvent to GL coordinates */
+/** sets the CCEventDispatcher (Mac only) */
+@property (nonatomic, readwrite, retain) CCEventDispatcher* eventDispatcher;
+
+/** converts an NSEvent to GL coordinates (Mac only) */
 -(CGPoint) convertEventToGL:(NSEvent*)event;
 @end
 
@@ -59,7 +62,7 @@ enum  {
 	NSWindow		*fullScreenWindow_;
 
 	// OpenGLView
-	CC_GLVIEW		*view_;
+	CCGLView		*view_;
 
 	// Event Dispatcher
 	CCEventDispatcher	*eventDispatcher_;
@@ -86,9 +89,6 @@ enum  {
  If resizeMode is kCCDirectorResize_NoScale, then no conversion will be done.
 */
 - (CGPoint) convertToLogicalCoordinates:(CGPoint)coordinates;
-
-/** CCEventDispatcher associated with the CCDirector */
-@property (nonatomic, retain, readwrite) CCEventDispatcher *eventDispatcher;
 @end
 
 

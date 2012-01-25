@@ -29,11 +29,12 @@
 #import "CCNode.h"
 #import "CCCamera.h"
 #import "ccTypes.h"
+#import "CCDirector.h"
 #import "kazmath/mat4.h"
 
 @class CCTexture2D;
 @class CCGrabber;
-@class GLProgram;
+@class CCGLProgram;
 
 /** Base class for other
  */
@@ -47,7 +48,9 @@
 	CCGrabber	*grabber_;
 	BOOL		isTextureFlipped_;
 
-	GLProgram	*shaderProgram_;
+	CCGLProgram	*shaderProgram_;
+
+	ccDirectorProjection	directorProjection_;
 }
 
 /** wheter or not the grid is active */
@@ -65,7 +68,7 @@
 /** is texture flipped */
 @property (nonatomic, readwrite) BOOL isTextureFlipped;
 /** shader program */
-@property (nonatomic, readwrite, assign) GLProgram *shaderProgram;
+@property (nonatomic, readwrite, assign) CCGLProgram *shaderProgram;
 
 +(id) gridWithSize:(ccGridSize)gridSize texture:(CCTexture2D*)texture flippedTexture:(BOOL)flipped;
 +(id) gridWithSize:(ccGridSize)gridSize;

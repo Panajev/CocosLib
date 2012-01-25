@@ -30,7 +30,7 @@
 #import "ccMacros.h"
 #import "CCTexture2D.h"
 #import "CCTextureCache.h"
-#import "GLProgram.h"
+#import "CCGLProgram.h"
 #import "ccGLState.h"
 #import "Support/OpenGL_Internal.h"
 //#import "CGPointExtension.h"
@@ -410,12 +410,13 @@
 
 -(void) fillWithEmptyQuadsFromIndex:(NSUInteger) index amount:(NSUInteger) amount
 {
-	ccV3F_C4B_T2F_Quad *quad = calloc(1,sizeof(ccV3F_C4B_T2F_Quad));
+	ccV3F_C4B_T2F_Quad quad;
+	bzero( &quad, sizeof(quad) );
 
 	NSUInteger to = index + amount;
 	for (NSInteger i = index ; i < to ; i++)
 	{
-		quads_[i] = *quad;
+		quads_[i] = quad;
 	}
 
 }

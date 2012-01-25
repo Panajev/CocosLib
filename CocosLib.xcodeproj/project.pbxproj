@@ -243,7 +243,6 @@
 		E6BB3DD414D0711300E19EA3 /* CCNode.m in Sources */ = {isa = PBXBuildFile; fileRef = E6BB3C8E14D0711300E19EA3 /* CCNode.m */; };
 		E6BB3DD514D0711300E19EA3 /* CCParallaxNode.m in Sources */ = {isa = PBXBuildFile; fileRef = E6BB3C8F14D0711300E19EA3 /* CCParallaxNode.m */; };
 		E6BB3DD614D0711300E19EA3 /* CCParticleBatchNode.m in Sources */ = {isa = PBXBuildFile; fileRef = E6BB3C9014D0711300E19EA3 /* CCParticleBatchNode.m */; };
-		E6BB3DD714D0711300E19EA3 /* CCParticleExamples.m in Sources */ = {isa = PBXBuildFile; fileRef = E6BB3C9114D0711300E19EA3 /* CCParticleExamples.m */; };
 		E6BB3DD814D0711300E19EA3 /* CCParticleSystem.m in Sources */ = {isa = PBXBuildFile; fileRef = E6BB3C9214D0711300E19EA3 /* CCParticleSystem.m */; };
 		E6BB3DD914D0711300E19EA3 /* CCParticleSystemQuad.m in Sources */ = {isa = PBXBuildFile; fileRef = E6BB3C9314D0711300E19EA3 /* CCParticleSystemQuad.m */; };
 		E6BB3DDA14D0711300E19EA3 /* CCProgressTimer.m in Sources */ = {isa = PBXBuildFile; fileRef = E6BB3C9414D0711300E19EA3 /* CCProgressTimer.m */; };
@@ -579,7 +578,6 @@
 		E6BB3C8E14D0711300E19EA3 /* CCNode.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CCNode.m; sourceTree = "<group>"; };
 		E6BB3C8F14D0711300E19EA3 /* CCParallaxNode.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CCParallaxNode.m; sourceTree = "<group>"; };
 		E6BB3C9014D0711300E19EA3 /* CCParticleBatchNode.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CCParticleBatchNode.m; sourceTree = "<group>"; };
-		E6BB3C9114D0711300E19EA3 /* CCParticleExamples.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CCParticleExamples.m; sourceTree = "<group>"; };
 		E6BB3C9214D0711300E19EA3 /* CCParticleSystem.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CCParticleSystem.m; sourceTree = "<group>"; };
 		E6BB3C9314D0711300E19EA3 /* CCParticleSystemQuad.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CCParticleSystemQuad.m; sourceTree = "<group>"; };
 		E6BB3C9414D0711300E19EA3 /* CCProgressTimer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CCProgressTimer.m; sourceTree = "<group>"; };
@@ -1213,7 +1211,6 @@
 				E6BB3C8E14D0711300E19EA3 /* CCNode.m */,
 				E6BB3C8F14D0711300E19EA3 /* CCParallaxNode.m */,
 				E6BB3C9014D0711300E19EA3 /* CCParticleBatchNode.m */,
-				E6BB3C9114D0711300E19EA3 /* CCParticleExamples.m */,
 				E6BB3C9214D0711300E19EA3 /* CCParticleSystem.m */,
 				E6BB3C9314D0711300E19EA3 /* CCParticleSystemQuad.m */,
 				E6BB3C9414D0711300E19EA3 /* CCProgressTimer.m */,
@@ -1699,7 +1696,6 @@
 				E6BB3DD414D0711300E19EA3 /* CCNode.m in Sources */,
 				E6BB3DD514D0711300E19EA3 /* CCParallaxNode.m in Sources */,
 				E6BB3DD614D0711300E19EA3 /* CCParticleBatchNode.m in Sources */,
-				E6BB3DD714D0711300E19EA3 /* CCParticleExamples.m in Sources */,
 				E6BB3DD814D0711300E19EA3 /* CCParticleSystem.m in Sources */,
 				E6BB3DD914D0711300E19EA3 /* CCParticleSystemQuad.m in Sources */,
 				E6BB3DDA14D0711300E19EA3 /* CCProgressTimer.m in Sources */,

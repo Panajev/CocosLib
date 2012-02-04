@@ -552,6 +552,7 @@
 	ccDrawPoly(vertices, 4, YES);
 #endif // CC_SPRITE_DEBUG_DRAW
 
+	CC_INCREMENT_GL_DRAWS(1);
 
 	CC_PROFILER_STOP_CATEGORY(kCCProfilerCategorySprite, @"CCSprite - draw");
 }
@@ -885,11 +886,11 @@
 
 	NSAssert( a, @"CCSprite#setDisplayFrameWithAnimationName: Frame not found");
 
-	CCSpriteFrame *frame = [[a frames] objectAtIndex:frameIndex];
+	CCAnimationFrame *frame = [[a frames] objectAtIndex:frameIndex];
 
 	NSAssert( frame, @"CCSprite#setDisplayFrame. Invalid frame");
 
-	[self setDisplayFrame:frame];
+	[self setDisplayFrame:frame.spriteFrame];
 }
 
 
@@ -935,10 +936,12 @@
 	// accept texture==nil as argument
 	NSAssert( !texture || [texture isKindOfClass:[CCTexture2D class]], @"setTexture expects a CCTexture2D. Invalid argument");
 
-	[texture_ release];
-	texture_ = [texture retain];
+	if( texture_ != texture ) {
+		[texture_ release];
+		texture_ = [texture retain];
 
-	[self updateBlendFunc];
+		[self updateBlendFunc];
+	}
 }
 
 -(CCTexture2D*) texture

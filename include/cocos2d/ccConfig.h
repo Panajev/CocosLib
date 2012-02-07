@@ -47,7 +47,7 @@
  @since v2.0.0
  */
 #ifndef CC_ENABLE_GL_STATE_CACHE
-#define CC_ENABLE_GL_STATE_CACHE (1-DEBUG)
+#define CC_ENABLE_GL_STATE_CACHE (1)
 #endif
 
 /** @def CC_FIX_ARTIFACTS_BY_STRECHING_TEXEL
@@ -91,7 +91,7 @@
  Default: 0,0 (bottom-left corner)
  */
 #ifndef CC_DIRECTOR_STATS_POSITION
-#define CC_DIRECTOR_STATS_POSITION ccp(10,10)
+#define CC_DIRECTOR_STATS_POSITION ccp(0,0)
 #endif
 
 /** @def CC_DIRECTOR_IOS_USE_BACKGROUND_THREAD

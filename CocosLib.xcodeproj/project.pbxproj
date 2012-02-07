@@ -673,13 +673,6 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
-		E6DDF2F712D8F8ED009031A5 /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 		E6E2A63012CE48E000923828 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -1545,7 +1538,6 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = E6DDF2F912D8F8ED009031A5 /* Build configuration list for PBXNativeTarget "CocosLib_script" */;
 			buildPhases = (
-				E6DDF2F712D8F8ED009031A5 /* Frameworks */,
 				E6DDF2F812D8F8ED009031A5 /* ShellScript */,
 			);
 			buildRules = (
@@ -1881,17 +1873,13 @@
 				CLANG_CXX_LIBRARY = "compiler-default";
 				COPY_PHASE_STRIP = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				GCC_DYNAMIC_NO_PIC = YES;
 				GCC_OPTIMIZATION_LEVEL = s;
 				GCC_PREPROCESSOR_DEFINITIONS = "DEBUG=0";
 				GCC_UNROLL_LOOPS = YES;
 				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				IPHONEOS_DEPLOYMENT_TARGET = 3.2;
-				LIBRARY_SEARCH_PATHS = (
-					"$(inherited)",
-					../SharedLibs/Utilities/lib,
-					"\"$(SRCROOT)/src/Box2D/Debug\"",
-				);
-				LLVM_LTO = NO;
+				LD_NO_PIE = YES;
 				OTHER_CFLAGS = (
 					"-mthumb",
 					"-mfpu=neon",
@@ -1931,6 +1919,7 @@
 					"-DRELEASE_VERSION",
 				);
 				PRODUCT_NAME = Cocos;
+				STRIP_INSTALLED_PRODUCT = YES;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				ZERO_LINK = NO;
 			};
@@ -2005,18 +1994,14 @@
 					armv6,
 				);
 				CLANG_CXX_LIBRARY = "compiler-default";
-				COPY_PHASE_STRIP = YES;
+				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				GCC_DYNAMIC_NO_PIC = YES;
 				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_PREPROCESSOR_DEFINITIONS = "DEBUG=1";
 				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				IPHONEOS_DEPLOYMENT_TARGET = 3.2;
-				LIBRARY_SEARCH_PATHS = (
-					"$(inherited)",
-					"../SharedLibs/Utilities-Debug/lib",
-					"\"$(SRCROOT)/src/Box2D/Debug\"",
-				);
-				LLVM_LTO = NO;
+				LD_NO_PIE = YES;
 				"OTHER_CFLAGS[arch=armv6]" = (
 					"-DRELEASE_VERSION",
 					"-mno-thumb",

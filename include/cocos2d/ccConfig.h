@@ -61,7 +61,7 @@
  @since v2.0.0
  */
 #ifndef CC_ENABLE_DEPRECATED
-#define CC_ENABLE_DEPRECATED 0
+#define CC_ENABLE_DEPRECATED (0)
 #endif
 
 

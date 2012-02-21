@@ -144,6 +144,8 @@ static NSUInteger globalOrderOfArrival = 1;
 		orderOfArrival_ = 0;
 
 		glServerState_ = CC_GL_BLEND;
+		
+		retainUserData_ = NO;
 
 		// set default scheduler and actionManager
 		CCDirector *director = [CCDirector sharedDirector];
@@ -178,6 +180,9 @@ static NSUInteger globalOrderOfArrival = 1;
 	[camera_ release];
 	[grid_ release];
 	[shaderProgram_ release];
+	
+	if( retainUserData_ )
+		[userData_ release];
 
 	// children
 	CCNode *child;
@@ -228,7 +233,7 @@ static NSUInteger globalOrderOfArrival = 1;
 	isTransformDirty_ = isInverseDirty_ = YES;
 }
 
--(void) setIsRelativeAnchorPoint: (BOOL)newValue
+-(void) setIsRelativeAnchorPoint: (bool)newValue
 {
 	isRelativeAnchorPoint_ = newValue;
 	isTransformDirty_ = isInverseDirty_ = YES;
@@ -274,6 +279,22 @@ static NSUInteger globalOrderOfArrival = 1;
 {
 	scaleX_ = scaleY_ = s;
 	isTransformDirty_ = isInverseDirty_ = YES;
+}
+
+-(void) setUserData:(void *)userData retainData:(BOOL)retainData
+{
+	if( userData_ != userData ) {
+
+		if( retainUserData_ )
+			[userData_ release];
+		
+		retainUserData_ = retainData;
+		
+		userData_ = userData;
+		
+		if( retainUserData_ )
+			[userData_ retain];
+	}
 }
 
 #pragma mark CCNode Composition

@@ -79,7 +79,7 @@ void ccGLUniformModelViewProjectionMatrix( CCGLProgram* program )
 
 -(CCGLView*) openGLView
 {
-	return (CCGLView*)self.view;
+	return (CCGLView*)view_;
 }
 @end
 
@@ -102,6 +102,52 @@ void ccGLUniformModelViewProjectionMatrix( CCGLProgram* program )
 -(CCSpriteFrame*) displayedFrame
 {
 	return [self displayedFrame];
+}
+@end
+
+@implementation CCMenuItemAtlasFont (Deprecated)
++(id) itemFromString: (NSString*) value charMapFile:(NSString*) charMapFile itemWidth:(int)itemWidth itemHeight:(int)itemHeight startCharMap:(char)startCharMap
+{
+	return [self itemWithString:value charMapFile:charMapFile itemWidth:itemWidth itemHeight:itemHeight startCharMap:startCharMap];
+}
++(id) itemFromString: (NSString*) value charMapFile:(NSString*) charMapFile itemWidth:(int)itemWidth itemHeight:(int)itemHeight startCharMap:(char)startCharMap target:(id) rec selector:(SEL) cb
+{
+	return [self itemWithString:value charMapFile:charMapFile itemWidth:itemWidth itemHeight:itemHeight startCharMap:startCharMap target:rec selector:cb];
+}
++(id) itemFromString: (NSString*) value charMapFile:(NSString*) charMapFile itemWidth:(int)itemWidth itemHeight:(int)itemHeight startCharMap:(char)startCharMap block:(void(^)(id sender))block
+{
+	return  [self itemWithString:value charMapFile:charMapFile itemWidth:itemWidth itemHeight:itemHeight startCharMap:startCharMap block:block];
+}
+-(id) initFromString: (NSString*) value charMapFile:(NSString*) charMapFile itemWidth:(int)itemWidth itemHeight:(int)itemHeight startCharMap:(char)startCharMap target:(id) rec selector:(SEL) cb
+{
+	return [self initWithString:value charMapFile:charMapFile itemWidth:itemWidth itemHeight:itemHeight startCharMap:startCharMap target:rec selector:cb];
+}
+-(id) initFromString: (NSString*) value charMapFile:(NSString*) charMapFile itemWidth:(int)itemWidth itemHeight:(int)itemHeight startCharMap:(char)startCharMap block:(void(^)(id sender))block
+{
+	return [self initWithString:value charMapFile:charMapFile itemWidth:itemWidth itemHeight:itemHeight startCharMap:startCharMap block:block];
+}
+@end
+
+@implementation CCMenuItemFont (Deprecated)
++(id) itemFromString: (NSString*) value
+{
+	return [self itemWithString:value];
+}
++(id) itemFromString: (NSString*) value target:(id) r selector:(SEL) s
+{
+	return [self itemWithString:value target:r selector:s];
+}
++(id) itemFromString: (NSString*) value block:(void(^)(id sender))block
+{
+	return [self itemWithString:value block:block];
+}
+-(id) initFromString: (NSString*) value target:(id) r selector:(SEL) s
+{
+	return [self initWithString:value target:r selector:s];
+}
+-(id) initFromString: (NSString*) value block:(void(^)(id sender))block
+{
+	return [self initWithString:value block:block];
 }
 @end
 
@@ -167,6 +213,98 @@ void ccGLUniformModelViewProjectionMatrix( CCGLProgram* program )
 	return [self initWithNormalImage:value selectedImage:value2 disabledImage:value3 block:block];
 }
 @end
+
+
+@implementation CCAnimation (Deprecated)
++(id) animationWithFrames:(NSArray*)arrayOfSpriteFrameNames
+{
+	return [self animationWithSpriteFrames:arrayOfSpriteFrameNames];
+}
++(id) animationWithFrames:(NSArray*)arrayOfSpriteFrameNames delay:(float)delay
+{
+	return [self animationWithSpriteFrames:arrayOfSpriteFrameNames delay:delay];
+}
+-(id) initWithFrames:(NSArray*)arrayOfSpriteFrameNames
+{
+	return [self initWithSpriteFrames:arrayOfSpriteFrameNames];
+}
+-(id) initWithFrames:(NSArray *)arrayOfSpriteFrameNames delay:(float)delay
+{
+	return [self initWithSpriteFrames:arrayOfSpriteFrameNames delay:delay];
+}
+-(void) addFrame:(CCSpriteFrame*)frame
+{
+	[self addSpriteFrame:frame];
+}
+-(void) addFrameWithFilename:(NSString*)filename
+{
+	[self addSpriteFrameWithFilename:filename];
+}
+-(void) addFrameWithTexture:(CCTexture2D*)texture rect:(CGRect)rect
+{
+	[self addSpriteFrameWithTexture:texture rect:rect];
+}
+@end
+
+@implementation CCAnimate (Deprecated)
++(id) actionWithAnimation:(CCAnimation*)animation restoreOriginalFrame:(BOOL)restoreOriginalFrame
+{
+	CCAnimation *anim = [[animation copy] autorelease];
+	anim.restoreOriginalFrame = restoreOriginalFrame;
+	
+	return [[[self alloc] initWithAnimation:anim] autorelease];
+}
++(id) actionWithDuration:(ccTime)duration animation:(CCAnimation*)animation restoreOriginalFrame:(BOOL)restoreOriginalFrame
+{
+	CCAnimation *anim = [[animation copy] autorelease];
+	anim.restoreOriginalFrame = restoreOriginalFrame;
+	anim.delayPerUnit =  duration / animation.frames.count;
+	
+	return [[[self alloc] initWithAnimation:anim] autorelease];	
+}
+-(id) initWithAnimation:(CCAnimation*)animation restoreOriginalFrame:(BOOL)restoreOriginalFrame
+{
+	CCAnimation *anim = [[animation copy] autorelease];
+	anim.restoreOriginalFrame = restoreOriginalFrame;
+	
+	return [self initWithAnimation:anim];	
+}
+-(id) initWithDuration:(ccTime)duration animation:(CCAnimation*)animation restoreOriginalFrame:(BOOL)restoreOriginalFrame
+{
+	CCAnimation *anim = [[animation copy] autorelease];
+	anim.restoreOriginalFrame = restoreOriginalFrame;
+	anim.delayPerUnit =  duration / animation.frames.count;
+	
+	return [self initWithAnimation:anim];
+}
+@end
+
+
+@implementation CCRenderTexture (Deprecated)
+-(BOOL)saveBuffer:(NSString*)name
+{
+	return [self saveToFile:name];
+}
+-(BOOL)saveBuffer:(NSString*)name format:(int)format
+{
+	return [self saveToFile:name format:format];
+}
+
+-(NSData*)getUIImageAsDataFromBuffer:(int) format
+{
+	NSAssert(NO, @"NOT IMPLEMENTED IN V2.0");
+	
+	return nil;
+}
+#if __CC_PLATFORM_IOS
+-(UIImage *)getUIImageFromBuffer
+{
+	return [self getUIImage];
+}
+#endif
+@end
+
+
 
 #if __CC_PLATFORM_IOS
 @implementation EAGLView

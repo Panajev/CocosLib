@@ -45,9 +45,7 @@
 
 - (id) init
 {
-	NSAssert(NO, @"CCLabelTTF: Init not supported. Use initWithString");
-	[self release];
-	return nil;
+    return [self initWithString:@"" fontName:@"Helvetica" fontSize:12];
 }
 
 + (id) labelWithString:(NSString*)string dimensions:(CGSize)dimensions alignment:(CCTextAlignment)alignment lineBreakMode:(CCLineBreakMode)lineBreakMode fontName:(NSString*)name fontSize:(CGFloat)size;
@@ -172,6 +170,22 @@
 - (float) fontSize
 {
     return fontSize_;
+}
+
+-(void) setDimensions:(CGSize) dim
+{
+    if( dim.width != dimensions_.width || dim.height != dimensions_.height)
+	{
+        dimensions_ = dim;
+        
+		// Force update
+		[self setString:[self string]];
+    }
+}
+
+-(CGSize) dimensions
+{
+    return dimensions_;
 }
 
 - (void) dealloc

@@ -58,6 +58,7 @@ enum {
 #define kCCShader_PositionTexture				@"ShaderPositionTexture"
 #define kCCShader_PositionTexture_uColor		@"ShaderPositionTexture_uColor"
 #define kCCShader_PositionTextureA8Color		@"ShaderPositionTextureA8Color"
+#define kCCShader_Position_uColor				@"ShaderPosition_uColor"
 
 // uniform names
 #define kCCUniformMVPMatrix_s			"u_MVPMatrix"
@@ -90,8 +91,11 @@ struct _hashUniformEntry;
 	GLint			uniforms_[kCCUniform_MAX];
 }
 
-- (id)initWithVertexShaderFilename:(NSString *)vShaderFilename
-            fragmentShaderFilename:(NSString *)fShaderFilename;
+/** Initializes the CCGLProgram with a vertex and fragment with bytes array */
+- (id)initWithVertexShaderByteArray:(const GLchar*)vShaderByteArray fragmentShaderByteArray:(const GLchar*)fShaderByteArray;
+
+/** Initializes the CCGLProgram with a vertex and fragment with contents of filenames */
+- (id)initWithVertexShaderFilename:(NSString *)vShaderFilename fragmentShaderFilename:(NSString *)fShaderFilename;
 
 /**  It will add a new attribute to the shader */
 - (void)addAttribute:(NSString *)attributeName index:(GLuint)index;

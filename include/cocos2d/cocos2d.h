@@ -114,6 +114,7 @@
 #import "CCGLProgram.h"
 #import "ccGLStateCache.h"
 #import "CCShaderCache.h"
+#import "ccShaders.h"
 
 //
 // cocos2d macros

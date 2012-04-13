@@ -49,6 +49,7 @@ Copyright (C) 2008 Apple Inc. All Rights Reserved.
  * Extended PVR formats for cocos2d project ( http://www.cocos2d-iphone.org )
  *	- RGBA8888
  *	- BGRA8888
+ *  - RGB888
  *  - RGBA4444
  *  - RGBA5551
  *  - RGB565
@@ -164,6 +165,7 @@ typedef struct _PVRTexHeader
 @synthesize width = width_;
 @synthesize height = height_;
 @synthesize hasAlpha = hasAlpha_;
+@synthesize numberOfMipmaps = numberOfMipmaps_;
 
 // cocos2d integration
 @synthesize retainName = retainName_;
@@ -190,6 +192,7 @@ typedef struct _PVRTexHeader
 		(uint32_t)gPVRTexIdentifier[2] != ((pvrTag >> 16) & 0xff) ||
 		(uint32_t)gPVRTexIdentifier[3] != ((pvrTag >> 24) & 0xff))
 	{
+		CCLOG(@"Unsupported PVR format. Use the Legacy format until the new format is supported");
 		return FALSE;
 	}
 
@@ -296,10 +299,23 @@ typedef struct _PVRTexHeader
 		if (name_ != 0)
 			ccGLDeleteTexture( name_ );
 
+		// From PVR sources: "PVR files are never row aligned."
 		glPixelStorei(GL_UNPACK_ALIGNMENT,1);
+
 		glGenTextures(1, &name_);
 		ccGLBindTexture2D( name_ );
 
+		// Default: Anti alias.
+		if( numberOfMipmaps_ == 1 )
+			glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
+		else
+			glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_NEAREST );
+		glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
+
+		glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE );
+		glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE );		
+
+		
 	}
 
 	CHECK_GL_ERROR(); // clean possible GL error

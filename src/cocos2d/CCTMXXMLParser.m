@@ -210,7 +210,7 @@
 
 - (void) parseXMLFile:(NSString *)xmlFilename
 {
-	NSURL *url = [NSURL fileURLWithPath:[CCFileUtils fullPathFromRelativePath:xmlFilename] ];
+	NSURL *url = [NSURL fileURLWithPath:[[CCFileUtils sharedFileUtils] fullPathFromRelativePath:xmlFilename] ];
 	NSData *data = [NSData dataWithContentsOfURL:url];
 	NSError* err = [self parseXMLData:data];
 	(void)err;
@@ -232,7 +232,7 @@
 		else if( [orientationStr isEqualToString:@"hexagonal"])
 			orientation_ = CCTMXOrientationHex;
 		else
-			CCLOG(@"cocos2d: TMXFomat: Unsupported orientation: %@", orientation_);
+			CCLOG(@"cocos2d: TMXFomat: Unsupported orientation: %d", orientation_);
 
 		mapSize_.width = [[attributeDict objectForKey:@"width"] intValue];
 		mapSize_.height = [[attributeDict objectForKey:@"height"] intValue];

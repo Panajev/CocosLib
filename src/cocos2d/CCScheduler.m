@@ -285,7 +285,7 @@ typedef struct _hashSelectorEntry
 		for( unsigned int i=0; i< element->timers->num; i++ ) {
 			CCTimer *timer = element->timers->arr[i];
 			if( selector == timer->selector ) {
-				CCLOG(@"CCScheduler#scheduleSelector. Selector already scheduled. Updating interval from: %.2f to %.2f", timer->interval, interval);
+				CCLOG(@"CCScheduler#scheduleSelector. Selector already scheduled. Updating interval from: %.4f to %.4f", timer->interval, interval);
 				timer->interval = interval;
 				return;
 			}
@@ -445,19 +445,23 @@ typedef struct _hashSelectorEntry
 
 - (void) removeUpdateFromHash:(tListEntry*)entry
 {
-    tHashUpdateEntry * element = NULL;
-
-    HASH_FIND_INT(hashForUpdates, &entry->target, element);
-    if( element ) {
-        // list entry
-        DL_DELETE( *element->list, element->entry );
-        free( element->entry );
-
-        // hash entry
-        [element->target release];
-        HASH_DEL( hashForUpdates, element);
-        free(element);
-    }
+	tHashUpdateEntry * element = NULL;
+	
+	HASH_FIND_INT(hashForUpdates, &entry->target, element);
+	if( element ) {
+		// list entry
+		DL_DELETE( *element->list, element->entry );
+		free( element->entry );
+		
+		// hash entry
+		id target = element->target;
+		HASH_DEL( hashForUpdates, element);
+		free(element);
+		
+		// target#release should be the last one to prevent
+		// a possible double-free. eg: If the [target dealloc] might want to remove it itself from there
+		[target release];
+	}
 }
 
 -(void) unscheduleUpdateForTarget:(id)target

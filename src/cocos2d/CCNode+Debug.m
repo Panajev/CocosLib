@@ -1,7 +1,7 @@
 /*
  * cocos2d for iPhone: http://www.cocos2d-iphone.org
  *
- * Copyright (c) 2011 ForzeField Studios S.L. http://forzefield.com
+ * Copyright (c) 2012 Zynga Inc.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -22,15 +22,50 @@
  * THE SOFTWARE.
  */
 
-#import "ccTypes.h"
+#import "CCNode+Debug.h"
 
-/** @file CCVertex.h */
+#ifdef DEBUG
 
-/** converts a line to a polygon */
-void ccVertexLineToPolygon(CGPoint *points, float stroke, ccVertex2F *vertices, NSUInteger offset, NSUInteger nuPoints);
+@implementation CCNode (Debug)
 
-/** returns wheter or not the line intersects */
-BOOL ccVertexLineIntersect(float Ax, float Ay,
-                             float Bx, float By,
-                             float Cx, float Cy,
-                             float Dx, float Dy, float *T);
+-(void) walkSceneGraph:(NSUInteger)level
+{
+	char buf[64];
+	NSUInteger i=0;
+	for( i=0; i<level+1; i++)
+		buf[i] = '-';
+	buf[i] = 0;
+	
+
+	if(children_) {
+		
+		[self sortAllChildren];
+		
+		ccArray *arrayData = children_->data;
+		i = 0;
+		
+		// draw children zOrder < 0
+		for( ; i < arrayData->num; i++ ) {
+			CCNode *child = arrayData->arr[i];
+			if ( [child zOrder] < 0 )
+				[child walkSceneGraph:level+1];
+			else
+				break;
+		}
+		
+		// self draw
+		NSLog(@"walk tree: %s> %@ %p", buf, self, self);
+		
+		// draw children zOrder >= 0
+		for( ; i < arrayData->num; i++ ) {
+			CCNode *child =  arrayData->arr[i];
+			[child walkSceneGraph:level+1];
+		}
+		
+	} else
+		NSLog(@"walk tree: %s> %@ %p", buf, self, self);
+	
+}
+@end
+
+#endif // DEBUG

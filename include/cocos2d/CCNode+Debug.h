@@ -1,7 +1,7 @@
 /*
  * cocos2d for iPhone: http://www.cocos2d-iphone.org
  *
- * Copyright (c) 2011 ForzeField Studios S.L. http://forzefield.com
+ * Copyright (c) 2012 Zynga Inc.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -22,15 +22,18 @@
  * THE SOFTWARE.
  */
 
-#import "ccTypes.h"
+#import "CCNode.h"
 
-/** @file CCVertex.h */
+#ifdef DEBUG
 
-/** converts a line to a polygon */
-void ccVertexLineToPolygon(CGPoint *points, float stroke, ccVertex2F *vertices, NSUInteger offset, NSUInteger nuPoints);
+/** Debugging extensions of CCNode.
+ They are available when the DEBUG macro is defined at compile time
+ */
+@interface CCNode (Debug)
 
-/** returns wheter or not the line intersects */
-BOOL ccVertexLineIntersect(float Ax, float Ay,
-                             float Bx, float By,
-                             float Cx, float Cy,
-                             float Dx, float Dy, float *T);
+/** prints on the debug console the scene graph */
+-(void) walkSceneGraph:(NSUInteger)level;
+
+@end
+
+#endif // DEBUG

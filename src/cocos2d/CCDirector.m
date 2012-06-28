@@ -91,6 +91,7 @@ extern NSString * cocos2dVersion(void);
 @synthesize displayStats = displayStats_;
 @synthesize nextDeltaTimeZero = nextDeltaTimeZero_;
 @synthesize isPaused = isPaused_;
+@synthesize isAnimating = isAnimating_;
 @synthesize sendCleanupToScene = sendCleanupToScene_;
 @synthesize runningThread = runningThread_;
 @synthesize notificationNode = notificationNode_;
@@ -203,7 +204,7 @@ static CCDirector *_sharedDirector = nil;
 	NSAssert( view_, @"view_ must be initialized");
 
 	[self setAlphaBlending: YES];
-	[self setDepthTest: YES];
+	[self setDepthTest: view_.depthFormat];
 	[self setProjection: projection_];
 
 	// set other opengl default values
@@ -407,6 +408,29 @@ static CCDirector *_sharedDirector = nil;
 	}
 }
 
+-(void) popToRootScene
+{
+	NSAssert(runningScene_ != nil, @"A running Scene is needed");
+	NSUInteger c = [scenesStack_ count];
+	
+    if (c == 1) {
+        [scenesStack_ removeLastObject];
+        [self end];
+    } else {
+        while (c > 1) {
+			CCScene *current = [scenesStack_ lastObject];
+			if( [current isRunning] )
+				[current onExit];
+			[current cleanup];
+			
+			[scenesStack_ removeLastObject];
+			c--;
+        }
+		nextScene_ = [scenesStack_ lastObject];
+		sendCleanupToScene_ = NO;
+    }
+}
+
 -(void) end
 {
 	[runningScene_ onExit];
@@ -557,7 +581,7 @@ static CCDirector *_sharedDirector = nil;
 			[FPSLabel_ setString:fpsstr];
 			[fpsstr release];
 			
-			NSString *draws = [[NSString alloc] initWithFormat:@"%4d", __ccNumberOfDraws];
+			NSString *draws = [[NSString alloc] initWithFormat:@"%4lu", (unsigned long)__ccNumberOfDraws];
 			[drawsLabel_ setString:draws];
 			[draws release];
 		}
@@ -587,9 +611,11 @@ static CCDirector *_sharedDirector = nil;
 
 		[FPSLabel_ release];
 		[SPFLabel_ release];
+		[drawsLabel_ release];
 		[[CCTextureCache sharedTextureCache ] removeTexture:texture];
 		FPSLabel_ = nil;
 		SPFLabel_ = nil;
+		drawsLabel_ = nil;
 		
 		[[CCFileUtils sharedFileUtils] purgeCachedEntries];
 	}

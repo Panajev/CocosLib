@@ -40,8 +40,6 @@ enum {
 	kCCLabelAutomaticWidth = -1,
 };
 
-struct _KerningHashElement;
-
 /** @struct ccBMFontDef
  BMFont definition
  */

@@ -71,27 +71,8 @@ void FNTConfigRemoveCache( void )
 	[configurations removeAllObjects];
 }
 
-#pragma mark - Hash Element
-
-// Equal function for targetSet.
-typedef struct _KerningHashElement
-{
-	int				key;		// key for the hash. 16-bit for 1st element, 16-bit for 2nd element
-	int				amount;
-	UT_hash_handle	hh;
-} tKerningHashElement;
-
-
 #pragma mark -
 #pragma mark BitmapFontConfiguration
-
-typedef struct _FontDefHashElement
-{
-	NSUInteger		key;		// key. Font Unicode value
-	ccBMFontDef		fontDef;	// font definition
-	UT_hash_handle	hh;
-} tFontDefHashElement;
-
 
 @interface CCBMFontConfiguration ()
 -(BOOL) parseConfigFile:(NSString*)controlFile;

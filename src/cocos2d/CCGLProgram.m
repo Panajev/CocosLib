@@ -187,17 +187,32 @@ typedef void (*GLLogFunction) (GLuint program,
     vertShader_ = fragShader_ = 0;
     
 #if DEBUG
-    glValidateProgram(program_);
     glGetProgramiv(program_, GL_LINK_STATUS, &status);
     NSString* log = self.programLog;
     
     if (status == GL_FALSE) {
-		NSLog(@"cocos2d: ERROR: Failed to link program: %i - %@", program_, log);
+        NSLog(@"cocos2d: ERROR: Failed to link program: %i - %@", program_, log);
         ccGLDeleteProgram( program_ );
-		program_ = 0;
+        program_ = 0;
     }
-    else if( log != nil ) {
-        NSLog(@"cocos2d: Link INFO: %@", log);
+    else {
+        if( log != nil ) {
+            NSLog(@"cocos2d: Link INFO: %@", log);
+        }
+        
+        glValidateProgram(program_);
+        glGetProgramiv(program_, GL_VALIDATE_STATUS, &status);
+        
+        log = self.programLog;
+        
+        if (status == GL_FALSE) {
+            NSLog(@"cocos2d: ERROR: Failed to validate program: %i - %@", program_, log);
+            ccGLDeleteProgram( program_ );
+            program_ = 0;
+        }
+        else if( log != nil ) {
+            NSLog(@"cocos2d: Validate Link INFO: %@", log);
+        }
     }
 #endif
     

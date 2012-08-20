@@ -38,6 +38,7 @@
 
 // extern
 #import "kazmath/GL/matrix.h"
+#import "CCRenderTargetNode.h"
 
 @implementation CCRenderTexture
 
@@ -45,7 +46,7 @@
 
 +(id)renderTextureWithWidth:(int)w height:(int)h pixelFormat:(CCTexture2DPixelFormat) format depthStencilFormat:(GLuint)depthStencilFormat
 {
-  return [[[self alloc] initWithWidth:w height:h pixelFormat:format depthStencilFormat:depthStencilFormat] autorelease];
+    return [[[self alloc] initWithWidth:w height:h pixelFormat:format depthStencilFormat:depthStencilFormat] autorelease];
 }
 
 // issue #994
@@ -66,7 +67,7 @@
 
 - (id)initWithWidth:(int)w height:(int)h pixelFormat:(CCTexture2DPixelFormat)format
 {
-  return [self initWithWidth:w height:h pixelFormat:format depthStencilFormat:0];
+    return [self initWithWidth:w height:h pixelFormat:format depthStencilFormat:0];
 }
 
 -(id)initWithWidth:(int)w height:(int)h pixelFormat:(CCTexture2DPixelFormat) format depthStencilFormat:(GLuint)depthStencilFormat
@@ -157,6 +158,16 @@
 	[super dealloc];
 }
 
+- (CCRenderTargetNode *)renderTargetNode
+{
+    if (!renderTargetNode_) {
+        renderTargetNode_ = [[CCRenderTargetNode alloc] initWithRenderTexture:self];
+        [self addChild:renderTargetNode_];
+        [renderTargetNode_ release];
+    }
+    return renderTargetNode_;
+}
+
 -(void)begin
 {
 	CCDirector *director = [CCDirector sharedDirector];
@@ -202,44 +213,44 @@
 
 -(void)beginWithClear:(float)r g:(float)g b:(float)b a:(float)a depth:(float)depthValue
 {
-  [self begin];
-
-  // save clear color
-  GLfloat	clearColor[4];
-  GLfloat depthClearValue;
-  glGetFloatv(GL_COLOR_CLEAR_VALUE,clearColor);
-  glGetFloatv(GL_DEPTH_CLEAR_VALUE, &depthClearValue);
-
-  glClearColor(r, g, b, a);
-  glClearDepth(depthValue);
-  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-  // restore clear color
-  glClearColor(clearColor[0], clearColor[1], clearColor[2], clearColor[3]);
-  glClearDepth(depthClearValue);
+    [self begin];
+    
+    // save clear color
+    GLfloat	clearColor[4];
+    GLfloat depthClearValue;
+    glGetFloatv(GL_COLOR_CLEAR_VALUE,clearColor);
+    glGetFloatv(GL_DEPTH_CLEAR_VALUE, &depthClearValue);
+    
+    glClearColor(r, g, b, a);
+    glClearDepth(depthValue);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    
+    // restore clear color
+    glClearColor(clearColor[0], clearColor[1], clearColor[2], clearColor[3]);
+    glClearDepth(depthClearValue);
 }
 
 -(void)beginWithClear:(float)r g:(float)g b:(float)b a:(float)a depth:(float)depthValue stencil:(int)stencilValue
 {
-  [self begin];
-
-  // save clear color
-  GLfloat	clearColor[4];
-  GLfloat depthClearValue;
-  int stencilClearValue;
-  glGetFloatv(GL_COLOR_CLEAR_VALUE,clearColor);
-  glGetFloatv(GL_DEPTH_CLEAR_VALUE, &depthClearValue);
-  glGetIntegerv(GL_STENCIL_CLEAR_VALUE, &stencilClearValue);
-
-  glClearColor(r, g, b, a);
-  glClearDepth(depthValue);
-  glClearStencil(stencilValue);
-  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-
-  // restore clear color
-  glClearColor(clearColor[0], clearColor[1], clearColor[2], clearColor[3]);
-  glClearDepth(depthClearValue);
-  glClearStencil(stencilClearValue);
+    [self begin];
+    
+    // save clear color
+    GLfloat	clearColor[4];
+    GLfloat depthClearValue;
+    int stencilClearValue;
+    glGetFloatv(GL_COLOR_CLEAR_VALUE,clearColor);
+    glGetFloatv(GL_DEPTH_CLEAR_VALUE, &depthClearValue);
+    glGetIntegerv(GL_STENCIL_CLEAR_VALUE, &stencilClearValue);
+    
+    glClearColor(r, g, b, a);
+    glClearDepth(depthValue);
+    glClearStencil(stencilValue);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+    
+    // restore clear color
+    glClearColor(clearColor[0], clearColor[1], clearColor[2], clearColor[3]);
+    glClearDepth(depthClearValue);
+    glClearStencil(stencilClearValue);
 }
 
 -(void)end
@@ -270,30 +281,30 @@
 
 - (void)clearDepth:(float)depthValue
 {
-  [self begin];
-  //! save old depth value
-  GLfloat depthClearValue;
-  glGetFloatv(GL_DEPTH_CLEAR_VALUE, &depthClearValue);
-
-  glClearDepth(depthValue);
-  glClear(GL_DEPTH_BUFFER_BIT);
-
-  // restore clear color
-  glClearDepth(depthClearValue);
-  [self end];
+    [self begin];
+    //! save old depth value
+    GLfloat depthClearValue;
+    glGetFloatv(GL_DEPTH_CLEAR_VALUE, &depthClearValue);
+    
+    glClearDepth(depthValue);
+    glClear(GL_DEPTH_BUFFER_BIT);
+    
+    // restore clear color
+    glClearDepth(depthClearValue);
+    [self end];
 }
 
 - (void)clearStencil:(int)stencilValue
 {
-  // save old stencil value
-  int stencilClearValue;
-  glGetIntegerv(GL_STENCIL_CLEAR_VALUE, &stencilClearValue);
-
-  glClearStencil(stencilValue);
-  glClear(GL_STENCIL_BUFFER_BIT);
-
-  // restore clear color
-  glClearStencil(stencilClearValue);
+    // save old stencil value
+    int stencilClearValue;
+    glGetIntegerv(GL_STENCIL_CLEAR_VALUE, &stencilClearValue);
+    
+    glClearStencil(stencilValue);
+    glClear(GL_STENCIL_BUFFER_BIT);
+    
+    // restore clear color
+    glClearStencil(stencilClearValue);
 }
 
 #pragma mark RenderTexture - Save Image

@@ -348,6 +348,8 @@
 		E610394F15DD169B00819640 /* vec4.h in Headers */ = {isa = PBXBuildFile; fileRef = E61037F915DD169B00819640 /* vec4.h */; };
 		E610395015DD169B00819640 /* png.h in Headers */ = {isa = PBXBuildFile; fileRef = E61037FB15DD169B00819640 /* png.h */; };
 		E610395115DD169B00819640 /* pngconf.h in Headers */ = {isa = PBXBuildFile; fileRef = E61037FC15DD169B00819640 /* pngconf.h */; };
+		E61D8BF515E2771F00F768B0 /* CCRenderTargetNode.h in Headers */ = {isa = PBXBuildFile; fileRef = E61D8BF415E2771F00F768B0 /* CCRenderTargetNode.h */; };
+		E61D8BF715E2772C00F768B0 /* CCRenderTargetNode.m in Sources */ = {isa = PBXBuildFile; fileRef = E61D8BF615E2772C00F768B0 /* CCRenderTargetNode.m */; };
 		E6AA4C0B13B156F800C9F08C /* CocosLib_Prefix.pch in Headers */ = {isa = PBXBuildFile; fileRef = E6AA4C0A13B156F800C9F08C /* CocosLib_Prefix.pch */; };
 		E6E2A63712CE492600923828 /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E6E2A63612CE492600923828 /* AVFoundation.framework */; };
 		E6E2A63912CE492600923828 /* CoreFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E6E2A63812CE492600923828 /* CoreFoundation.framework */; };
@@ -706,6 +708,8 @@
 		E61037F915DD169B00819640 /* vec4.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = vec4.h; sourceTree = "<group>"; };
 		E61037FB15DD169B00819640 /* png.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = png.h; sourceTree = "<group>"; };
 		E61037FC15DD169B00819640 /* pngconf.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = pngconf.h; sourceTree = "<group>"; };
+		E61D8BF415E2771F00F768B0 /* CCRenderTargetNode.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CCRenderTargetNode.h; sourceTree = "<group>"; };
+		E61D8BF615E2772C00F768B0 /* CCRenderTargetNode.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CCRenderTargetNode.m; sourceTree = "<group>"; };
 		E64FA07213E75380001A90C1 /* LICENSE_artwork.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = LICENSE_artwork.txt; sourceTree = "<group>"; };
 		E64FA07313E75380001A90C1 /* LICENSE_Box2D.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = LICENSE_Box2D.txt; sourceTree = "<group>"; };
 		E64FA07513E75380001A90C1 /* LICENSE_cocos2d.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = LICENSE_cocos2d.txt; sourceTree = "<group>"; };
@@ -907,6 +911,7 @@
 		E61036B415DD169B00819640 /* cocos2d */ = {
 			isa = PBXGroup;
 			children = (
+				E61D8BF615E2772C00F768B0 /* CCRenderTargetNode.m */,
 				E61036B515DD169B00819640 /* CCAction.m */,
 				E61036B615DD169B00819640 /* CCActionCamera.m */,
 				E61036B715DD169B00819640 /* CCActionCatmullRom.m */,
@@ -1228,6 +1233,7 @@
 		E610377115DD169B00819640 /* cocos2d */ = {
 			isa = PBXGroup;
 			children = (
+				E61D8BF415E2771F00F768B0 /* CCRenderTargetNode.h */,
 				E610377215DD169B00819640 /* CCAction.h */,
 				E610377315DD169B00819640 /* CCActionCamera.h */,
 				E610377415DD169B00819640 /* CCActionCatmullRom.h */,
@@ -1629,6 +1635,7 @@
 				E610394F15DD169B00819640 /* vec4.h in Headers */,
 				E610395015DD169B00819640 /* png.h in Headers */,
 				E610395115DD169B00819640 /* pngconf.h in Headers */,
+				E61D8BF515E2771F00F768B0 /* CCRenderTargetNode.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1881,6 +1888,7 @@
 				E610389E15DD169B00819640 /* pngwrite.c in Sources */,
 				E610389F15DD169B00819640 /* pngwtran.c in Sources */,
 				E61038A015DD169B00819640 /* pngwutil.c in Sources */,
+				E61D8BF715E2772C00F768B0 /* CCRenderTargetNode.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

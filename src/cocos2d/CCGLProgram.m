@@ -375,6 +375,13 @@ typedef void (*GLLogFunction) (GLuint program,
 	[self setUniformLocation:uniforms_[kCCUniformMVPMatrix] withMatrix4fv:matrixMVP.mat count:1];
 }
 
+- (GLint)uniformLocationForName:(NSString*)name
+{
+    NSAssert(name != nil, @"Invalid uniform name" );
+    NSAssert(program_ != 0, @"Invalid operation. Cannot get uniform location when program is not initialized");
+    
+    return glGetUniformLocation(program_, [name UTF8String]);
+}
 
 #pragma mark -
 

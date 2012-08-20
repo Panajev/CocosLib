@@ -6,16 +6,16 @@ Current patches applied and changes from Cocos2D's master-v2 branch (20120820).
 
 https://github.com/cocos2d/cocos2d-iphone/commit/89244ec00d85245dcc074d8aade573c610fbab47
 
+3.) Optimisation - eliminated costly [NSNumber floatValue] calls
+https://github.com/cocos2d/cocos2d-iphone/pull/232
+
 TODO:
 
 1.) Support for animated transitions when pushing or popping scenes:
 https://github.com/cocos2d/cocos2d-iphone/pull/230
 
-2.) Optimisation - eliminated costly [NSNumber floatValue] calls
-https://github.com/cocos2d/cocos2d-iphone/pull/232
-
-3.) Rendering Target Node - Rendering to texture made simpler.
+2.) Rendering Target Node - Rendering to texture made simpler.
 https://github.com/cocos2d/cocos2d-iphone/pull/231
 
-4.) CCGLProgram guards, fixes and debugging info
+3.) CCGLProgram guards, fixes and debugging info
 https://github.com/cocos2d/cocos2d-iphone/pull/212

@@ -1,0 +1,21 @@
+Current patches applied and changes from Cocos2D's master-v2 branch (20120820).
+
+1.) PVRv3 format support from develop-v2.
+
+2.) Removed some font related forward declarations (merged in develop-v2 check if this has already been brought in master-v2)… tFontDefHashElement and KerningHashElement… 
+
+https://github.com/cocos2d/cocos2d-iphone/commit/89244ec00d85245dcc074d8aade573c610fbab47
+
+TODO:
+
+1.) Support for animated transitions when pushing or popping scenes:
+https://github.com/cocos2d/cocos2d-iphone/pull/230
+
+2.) Optimisation - eliminated costly [NSNumber floatValue] calls
+https://github.com/cocos2d/cocos2d-iphone/pull/232
+
+3.) Rendering Target Node - Rendering to texture made simpler.
+https://github.com/cocos2d/cocos2d-iphone/pull/231
+
+4.) CCGLProgram guards, fixes and debugging info
+https://github.com/cocos2d/cocos2d-iphone/pull/212

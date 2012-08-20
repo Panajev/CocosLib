@@ -12,11 +12,12 @@ https://github.com/cocos2d/cocos2d-iphone/pull/230
 4.) Optimisation - eliminated costly [NSNumber floatValue] calls
 https://github.com/cocos2d/cocos2d-iphone/pull/232
 
+5.) CCGLProgram guards, fixes and debugging info
+https://github.com/cocos2d/cocos2d-iphone/pull/212
+
+	Added some further fixes: https://github.com/iomac/cocos2d-iphone/commit/c3f1ffb2a47402acf351da6fff33e8cf83fe0258#commitcomment-1737403
 
 TODO:
 
 1.) Rendering Target Node - Rendering to texture made simpler.
 https://github.com/cocos2d/cocos2d-iphone/pull/231
-
-2.) CCGLProgram guards, fixes and debugging info
-https://github.com/cocos2d/cocos2d-iphone/pull/212

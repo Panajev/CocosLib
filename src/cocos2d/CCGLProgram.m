@@ -108,7 +108,10 @@ typedef void (*GLLogFunction) (GLuint program,
 	
 	const GLchar * vertexSource = (GLchar*) [[NSString stringWithContentsOfFile:[[CCFileUtils sharedFileUtils] fullPathFromRelativePath:vShaderFilename] encoding:NSUTF8StringEncoding error:nil] UTF8String];
 	const GLchar * fragmentSource = (GLchar*) [[NSString stringWithContentsOfFile:[[CCFileUtils sharedFileUtils] fullPathFromRelativePath:fShaderFilename] encoding:NSUTF8StringEncoding error:nil] UTF8String];
-
+    
+    NSAssert1( !vShaderFilename || (vShaderFilename && vertexSource),    @"vertex shader:   %@ - file not found", vShaderFilename );
+    NSAssert1( !fShaderFilename || (fShaderFilename && fragmentSource),  @"fragment shader: %@ - file not found", fShaderFilename );
+    
 	return [self initWithVertexShaderByteArray:vertexSource fragmentShaderByteArray:fragmentSource];
 }
 
@@ -152,6 +155,9 @@ typedef void (*GLLogFunction) (GLuint program,
 
 -(void) updateUniforms
 {
+    // All of the below gl methods will fail if _program is not valid
+    NSAssert( program_ != 0, @"Cannot update uniforms without a valid shader program" );
+    
 	// Since sample most probably won't change, set it to 0 now.
 
 	uniforms_[kCCUniformMVPMatrix] = glGetUniformLocation(program_, kCCUniformMVPMatrix_s);
@@ -167,33 +173,35 @@ typedef void (*GLLogFunction) (GLuint program,
 
 - (BOOL)link
 {
+    NSAssert(program_ != 0, @"Cannot link invalid program");
+    
+    GLint status = GL_TRUE;
     glLinkProgram(program_);
-
-#if DEBUG
-	GLint status;
-    glValidateProgram(program_);
-
-    glGetProgramiv(program_, GL_LINK_STATUS, &status);
-    if (status == GL_FALSE) {
-		CCLOG(@"cocos2d: ERROR: Failed to link program: %i", program_);
-		if( vertShader_ )
-			glDeleteShader( vertShader_ );
-		if( fragShader_ )
-			glDeleteShader( fragShader_ );
-		ccGLDeleteProgram( program_ );
-		vertShader_ = fragShader_ = program_ = 0;
-        return NO;
-	}
-#endif
-
-    if (vertShader_)
+    
+    if (vertShader_) {
         glDeleteShader(vertShader_);
-    if (fragShader_)
+    }
+    if (fragShader_) {
         glDeleteShader(fragShader_);
-
-	vertShader_ = fragShader_ = 0;
-
-    return YES;
+    }
+    vertShader_ = fragShader_ = 0;
+    
+#if DEBUG
+    glValidateProgram(program_);
+    glGetProgramiv(program_, GL_LINK_STATUS, &status);
+    NSString* log = self.programLog;
+    
+    if (status == GL_FALSE) {
+		NSLog(@"cocos2d: ERROR: Failed to link program: %i - %@", program_, log);
+        ccGLDeleteProgram( program_ );
+		program_ = 0;
+    }
+    else if( log != nil ) {
+        NSLog(@"cocos2d: Link INFO: %@", log);
+    }
+#endif
+    
+    return status == GL_TRUE;
 }
 
 - (void)use

@@ -19,3 +19,6 @@ https://github.com/cocos2d/cocos2d-iphone/pull/212
 
 6.) Rendering Target Node - Rendering to texture made simpler.
 https://github.com/cocos2d/cocos2d-iphone/pull/231
+
+7.) Fix for issue #1398: Double firing of CCCallBlock in CCSequence.
+https://github.com/cocos2d/cocos2d-iphone/pull/233

@@ -195,25 +195,6 @@ typedef void (*GLLogFunction) (GLuint program,
         ccGLDeleteProgram( program_ );
         program_ = 0;
     }
-    else {
-        if( log != nil ) {
-            NSLog(@"cocos2d: Link INFO: %@", log);
-        }
-        
-        glValidateProgram(program_);
-        glGetProgramiv(program_, GL_VALIDATE_STATUS, &status);
-        
-        log = self.programLog;
-        
-        if (status == GL_FALSE) {
-            NSLog(@"cocos2d: ERROR: Failed to validate program: %i - %@", program_, log);
-            ccGLDeleteProgram( program_ );
-            program_ = 0;
-        }
-        else if( log != nil ) {
-            NSLog(@"cocos2d: Validate Link INFO: %@", log);
-        }
-    }
 #endif
     
     return status == GL_TRUE;

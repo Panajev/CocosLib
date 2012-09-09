@@ -1,5 +1,10 @@
-General notes
-=============
+CocosLib
+========
+
+The idea behind this project is to allow Cocos2D and Box2D to be easily compiled and packaged into a compact and easily embeddable form.
+
+General Notes
+-------------
 
 Current patches applied and changes from Cocos2D's master-v2 branch (20120820).
 
@@ -32,8 +37,8 @@ https://github.com/cocos2d/cocos2d-iphone/pull/233
     https://github.com/cocos2d/cocos2d-iphone/commit/ec7cc1c7437dc4a590de7b8103504d4aa00b4503
 
 
-HOWTO install
-=============
+HOWTO Install
+-------------
 
 In order to download and use this library in your project and all the other helper libraries I usually rely on with other applications of mine, you can use the following script (or you can fork each, then clone, and build each of them using the script target) to download the latest tag:
 

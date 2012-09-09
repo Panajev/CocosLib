@@ -1,3 +1,6 @@
+General notes
+=============
+
 Current patches applied and changes from Cocos2D's master-v2 branch (20120820).
 
 1.) PVRv3 format support from develop-v2.
@@ -28,6 +31,9 @@ https://github.com/cocos2d/cocos2d-iphone/pull/233
 8.) Fixed CCSprite's displayFrame function not returning the correct frame in Retina mode (taken from develop-v2).
     https://github.com/cocos2d/cocos2d-iphone/commit/ec7cc1c7437dc4a590de7b8103504d4aa00b4503
 
+
+HOWTO install
+=============
 
 In order to download and use this library in your project and all the other helper libraries I usually rely on with other applications of mine, you can use the following script (or you can fork each, then clone, and build each of them using the script target) to download the latest tag:
 

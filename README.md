@@ -31,7 +31,7 @@ https://github.com/cocos2d/cocos2d-iphone/pull/233
 
 In order to download and use this library in your project and all the other helper libraries I usually rely on with other applications of mine, you can use the following script (or you can fork each, then clone, and build each of them using the script target) to download the latest tag:
 
-```bash
+```
 #!/bin/bash
 LIBS="Utilities CocosLib CocosTools"
 
@@ -52,7 +52,7 @@ done
 
 or this script to download a specific tag (just an example):
 
-```bash
+```
 #!/bin/bash
 LIBS="Utilities CocosLib CocosTools"
 #SAFE_TAGS="v1.1.2 v1.2.8 v1.1.4"

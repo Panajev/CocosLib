@@ -717,7 +717,7 @@
 		E64FA07813E75380001A90C1 /* LICENSE_libpng.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = LICENSE_libpng.txt; sourceTree = "<group>"; };
 		E64FA07A13E75380001A90C1 /* LICENSE.cocos2d */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = LICENSE.cocos2d; sourceTree = "<group>"; };
 		E64FA07B13E75380001A90C1 /* LICENSE.cocosdenshion */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = LICENSE.cocosdenshion; sourceTree = "<group>"; };
-		E6AA490813B156A600C9F08C /* README */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = README; sourceTree = "<group>"; };
+		E66F10C915FE2A2300FB8F3F /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = README.md; sourceTree = "<group>"; };
 		E6AA4AA413B156A600C9F08C /* zip_exclude.lst */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = zip_exclude.lst; sourceTree = "<group>"; };
 		E6AA4C0A13B156F800C9F08C /* CocosLib_Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CocosLib_Prefix.pch; sourceTree = "<group>"; };
 		E6E142C913B3EC990052ED3D /* libCocosLib_script.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libCocosLib_script.a; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -760,11 +760,11 @@
 		0867D691FE84028FC02AAC07 /* CocosLib */ = {
 			isa = PBXGroup;
 			children = (
+				E66F10C915FE2A2300FB8F3F /* README.md */,
 				E610373915DD169B00819640 /* include */,
 				E610367D15DD169B00819640 /* src */,
 				E6AA4DA213B1574400C9F08C /* resources */,
 				E6AA4C0A13B156F800C9F08C /* CocosLib_Prefix.pch */,
-				E6AA490813B156A600C9F08C /* README */,
 				E6AA4AA413B156A600C9F08C /* zip_exclude.lst */,
 				0867D69AFE84028FC02AAC07 /* Frameworks */,
 				034768DFFF38A50411DB9C8B /* Products */,

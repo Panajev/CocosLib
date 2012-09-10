@@ -66,7 +66,7 @@ or this script to download a specific tag (just an example):
 ```
 #!/bin/bash
 LIBS="Utilities CocosLib CocosTools"
-#SAFE_TAGS="v1.1.2 v1.2.8 v1.1.4"
+#SAFE_TAGS="v1.1.2 v1.2.8 v1.1.6"
 
 git clone https://github.com/Panajev/Utilities.git Utilities
 cd Utilities
@@ -80,7 +80,7 @@ cd ..
 
 git clone https://github.com/Panajev/CocosTools.git CocosTools
 cd CocosTools
-git checkout v1.1.4
+git checkout v1.1.6
 cd..
 
 rm -rf ~/Programming/SharedLibs

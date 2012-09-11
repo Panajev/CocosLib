@@ -44,6 +44,10 @@ In order to download and use this library in your project and all the other help
 
 ```
 #!/bin/bash
+#Do we need to download the code from GitHub? 
+#Set to false to just build the library again after successfully cloning the repo's.
+DOWNLOAD_GIT="TRUE"
+
 #To download the latest tag
 SAFE_TAG=("" "" "")
 
@@ -56,16 +60,22 @@ rm -rf ~/Programming/SharedLibs
 for f in "${LIBS[@]}"; do
     set -- $f
     echo
-    git clone https://github.com/Panajev/"$1".git "$1"
+
+    if [ "$DOWNLOAD_GIT" == "TRUE" ]; then
+        git clone https://github.com/Panajev/"$1".git "$1"
+    fi
     #echo "$1 $2"
 
     cd "$1"
-    if [ x"$2" != x ]; then
-        echo Checking out tag "$2"
-        git checkout -b localBranch_"$1" "$2"
-    else
-        echo Checking out latest version
+    if [ "$DOWNLOAD_GIT" == "TRUE" ]; then
+        if [ x"$2" != x ]; then
+            echo Checking out tag "$2"
+            git checkout -b localBranch_"$1" "$2"
+        else
+            echo Checking out latest version
+        fi
     fi
+
     echo Processing "$1"_script
     /Applications/Xcode.app/Contents/Developer/usr/bin/xcodebuild clean -target "$1"_script
     /Applications/Xcode.app/Contents/Developer/usr/bin/xcodebuild build -target "$1"_script

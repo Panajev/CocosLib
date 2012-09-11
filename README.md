@@ -36,6 +36,8 @@ https://github.com/cocos2d/cocos2d-iphone/pull/233
 8.) Fixed CCSprite's displayFrame function not returning the correct frame in Retina mode (taken from develop-v2).
     https://github.com/cocos2d/cocos2d-iphone/commit/ec7cc1c7437dc4a590de7b8103504d4aa00b4503
 
+9.) Added the ability to turn off debug drawing for a CCSprite node or any of its subclasses at runtime.
+    
 
 HOWTO Install
 -------------

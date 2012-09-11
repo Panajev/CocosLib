@@ -40,56 +40,35 @@ https://github.com/cocos2d/cocos2d-iphone/pull/233
 HOWTO Install
 -------------
 
-In order to download and use this library in your project and all the other helper libraries I usually rely on with other applications of mine, you can use the following script (or you can fork each, then clone, and build each of them using the script target) to download the latest tag:
+In order to download and use this library in your project and all the other helper libraries I usually rely on with other applications of mine, you can use the following script (or you can fork each, then clone, and build each of them using the script target):
 
 ```
 #!/bin/bash
-LIBS="Utilities CocosLib CocosTools"
+#To download the latest tag
+SAFE_TAG=("" "" "")
 
-git clone https://github.com/Panajev/Utilities.git Utilities
-git clone https://github.com/Panajev/CocosLib.git CocosLib
-git clone https://github.com/Panajev/CocosTools.git CocosTools
+#To download a specific tag
+#SAFE_TAG=("v1.1.2" "v1.2.8" "1.1.6")
 
+LIBS=("Utilities ${SAFE_TAG[0]}" "CocosLib ${SAFE_TAG[1]}" "CocosTools ${SAFE_TAG[2]}")
 rm -rf ~/Programming/SharedLibs
 
-for f in $LIBS; do
-    cd "$f"
-    echo "$f"_script
-    /Applications/Xcode.app/Contents/Developer/usr/bin/xcodebuild clean -target "$f"_script
-    /Applications/Xcode.app/Contents/Developer/usr/bin/xcodebuild build -target "$f"_script
-    cd ..
-done
-```
+for f in "${LIBS[@]}"; do
+    set -- $f
+    echo
+    git clone https://github.com/Panajev/"$1".git "$1"
+    #echo "$1 $2"
 
-or this script to download a specific tag (just an example):
-
-```
-#!/bin/bash
-LIBS="Utilities CocosLib CocosTools"
-#SAFE_TAGS="v1.1.2 v1.2.8 v1.1.6"
-
-git clone https://github.com/Panajev/Utilities.git Utilities
-cd Utilities
-git checkout v1.1.2
-cd..
-
-git clone https://github.com/Panajev/CocosLib.git CocosLib
-cd CocosLib
-git checkout v1.2.8
-cd ..
-
-git clone https://github.com/Panajev/CocosTools.git CocosTools
-cd CocosTools
-git checkout v1.1.6
-cd..
-
-rm -rf ~/Programming/SharedLibs
-
-for f in $LIBS; do
-    cd "$f"
-    echo "$f"_script
-    /Applications/Xcode.app/Contents/Developer/usr/bin/xcodebuild clean -target "$f"_script
-    /Applications/Xcode.app/Contents/Developer/usr/bin/xcodebuild build -target "$f"_script
+    cd "$1"
+    if [ x"$2" != x ]; then
+        echo Checking out tag "$2"
+        git checkout -b localBranch_"$1" "$2"
+    else
+        echo Checking out latest version
+    fi
+    echo Processing "$1"_script
+    /Applications/Xcode.app/Contents/Developer/usr/bin/xcodebuild clean -target "$1"_script
+    /Applications/Xcode.app/Contents/Developer/usr/bin/xcodebuild build -target "$1"_script
     cd ..
 done
 ```

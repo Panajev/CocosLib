@@ -46,9 +46,8 @@ In order to download and use this library in your project and all the other help
 
 ```
 #!/bin/bash
-#Do we need to download the code from GitHub? 
-#Set to false to just build the library again after successfully cloning the repo's.
-DOWNLOAD_GIT="TRUE"
+#Do we need to force the script to download the code from GitHub?
+DOWNLOAD_GIT="FALSE"
 
 #To download the latest tag
 SAFE_TAG=("" "" "")
@@ -63,7 +62,8 @@ for f in "${LIBS[@]}"; do
     set -- $f
     echo
 
-    if [ "$DOWNLOAD_GIT" == "TRUE" ]; then
+    if [ "$DOWNLOAD_GIT" == "TRUE" ] ||  [ ! -d "$1" ]; then
+        rm -rf "$1"
         git clone https://github.com/Panajev/"$1".git "$1"
     fi
     #echo "$1 $2"

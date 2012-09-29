@@ -38,6 +38,9 @@ https://github.com/cocos2d/cocos2d-iphone/pull/233
 
 9.) Added the ability to turn off debug drawing for a CCSprite node or any of its subclasses at runtime.
     https://github.com/cocos2d/cocos2d-iphone/pull/234
+    
+10.) Fixed issue with CCRenderTexture causing the wrong viewport and view matrix to be restored when used inside a custom draw/visit method.
+    https://github.com/cocos2d/cocos2d-iphone/pull/238
 
 HOWTO Install
 -------------

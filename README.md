@@ -60,8 +60,10 @@ SAFE_TAG=("" "" "" "" "")
 
 LIBS=("Utilities ${SAFE_TAG[0]}" "CocosLib ${SAFE_TAG[1]}" "CocosTools ${SAFE_TAG[2]}" "PRKit ${SAFE_TAG[3]}" "SneakyInput ${SAFE_TAG[4]}")
 rm -rf ~/Programming/SharedLibs
+rm -rf ~/Programming/SharedLibsMac
 mkdir -p ~/Programming
 mkdir -p ~/Programming/SharedLibs
+mkdir -p ~/Programming/SharedLibsMac
 
 for f in "${LIBS[@]}"; do
     set -- $f
@@ -84,8 +86,14 @@ for f in "${LIBS[@]}"; do
     fi
 
     echo Processing "$1"_script
+    echo iOS build
     /Applications/Xcode.app/Contents/Developer/usr/bin/xcodebuild clean -target "$1"_script
     /Applications/Xcode.app/Contents/Developer/usr/bin/xcodebuild build -target "$1"_script
+    
+    echo MacOS X build
+    /Applications/Xcode.app/Contents/Developer/usr/bin/xcodebuild clean -target "$1"Mac_script
+    /Applications/Xcode.app/Contents/Developer/usr/bin/xcodebuild build -target "$1"Mac_script
+    
     cd ..
 done
 ```

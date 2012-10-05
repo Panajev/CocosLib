@@ -2890,6 +2890,7 @@
 				GCC_PREFIX_HEADER = "CocosLibMac_script/CocosLibMac_script-Prefix.pch";
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"DEBUG=1",
+					"COCOS2D_DEBUG=1",
 					"$(inherited)",
 				);
 				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
@@ -3119,6 +3120,7 @@
 				E69291E5161ECA2F00DB1EAA /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		E692936F161ED0A400DB1EAA /* Build configuration list for PBXNativeTarget "CocosLibMac_script" */ = {
 			isa = XCConfigurationList;
@@ -3127,6 +3129,7 @@
 				E6929371161ED0A400DB1EAA /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		E6DDF2F912D8F8ED009031A5 /* Build configuration list for PBXNativeTarget "CocosLib_script" */ = {
 			isa = XCConfigurationList;

@@ -41,6 +41,9 @@ https://github.com/cocos2d/cocos2d-iphone/pull/233
     
 10.) Fixed issue with CCRenderTexture causing the wrong viewport and view matrix to be restored when used inside a custom draw/visit method.
     https://github.com/cocos2d/cocos2d-iphone/pull/238
+    
+11.) Fixed an issue with the results of the ccpAngle method (slightly slower perhaps, but this should be more accurate):
+    https://github.com/cocos2d/cocos2d-iphone/pull/213
 
 HOWTO Install
 -------------

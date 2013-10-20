@@ -30,116 +30,16 @@
 
 #ifdef __CC_PLATFORM_IOS
 #import <UIKit/UIKit.h>									// Needed for UIAccelerometerDelegate
-#import "Platforms/iOS/CCTouchDelegateProtocol.h"		// Touches only supported on iOS
 #elif defined(__CC_PLATFORM_MAC)
-#import "Platforms/Mac/CCEventDispatcher.h"
+
 #endif
 
 #import "CCProtocols.h"
 #import "CCNode.h"
 
-#pragma mark -
-#pragma mark CCLayer
+#pragma mark - CCLayer
 
-/** CCLayer is a subclass of CCNode that implements the CCTouchEventsDelegate protocol.
-
- All features from CCNode are valid, plus the following new features:
- - It can receive iPhone Touches
- - It can receive Accelerometer input
-*/
-#ifdef __CC_PLATFORM_IOS
-@interface CCLayer : CCNode <UIAccelerometerDelegate, CCStandardTouchDelegate, CCTargetedTouchDelegate>
-{
-	BOOL isTouchEnabled_;
-	BOOL isAccelerometerEnabled_;
-}
-/** If isTouchEnabled, this method is called onEnter. Override it to change the
- way CCLayer receives touch events.
- ( Default: [touchDispatcher addStandardDelegate:self priority:0] )
- Example:
-     -(void) registerWithTouchDispatcher
-     {
-        [touchDispatcher addTargetedDelegate:self priority:INT_MIN+1 swallowsTouches:YES];
-     }
-
- Valid only on iOS. Not valid on Mac.
-
- @since v0.8.0
- */
--(void) registerWithTouchDispatcher;
-
-/** whether or not it will receive Touch events.
- You can enable / disable touch events with this property.
- Only the touches of this node will be affected. This "method" is not propagated to its children.
-
- Valid on iOS and Mac OS X v10.6 and later.
-
- @since v0.8.1
- */
-@property(nonatomic,assign) BOOL isTouchEnabled;
-/** whether or not it will receive Accelerometer events
- You can enable / disable accelerometer events with this property.
-
- Valid only on iOS. Not valid on Mac.
-
- @since v0.8.1
- */
-@property(nonatomic,assign) BOOL isAccelerometerEnabled;
-
-#elif defined(__CC_PLATFORM_MAC)
-
-
-@interface CCLayer : CCNode <CCKeyboardEventDelegate, CCMouseEventDelegate, CCTouchEventDelegate>
-{
-	BOOL	isMouseEnabled_;
-	BOOL	isKeyboardEnabled_;
-	BOOL	isTouchEnabled_;
-}
-
-/** whether or not it will receive mouse events.
-
- Valind only Mac. Not valid on iOS
- */
-@property (nonatomic, readwrite) BOOL isMouseEnabled;
-
-/** whether or not it will receive keyboard events.
-
- Valind only Mac. Not valid on iOS
- */
-@property (nonatomic, readwrite) BOOL isKeyboardEnabled;
-
-/** whether or not it will receive touch events.
-
- Valid on iOS and Mac OS X v10.6 and later.
- */
-@property (nonatomic, readwrite) BOOL isTouchEnabled;
-
-/** priority of the mouse event delegate.
- Default 0.
- Override this method to set another priority.
-
- Valind only Mac. Not valid on iOS
- */
--(NSInteger) mouseDelegatePriority;
-
-/** priority of the keyboard event delegate.
- Default 0.
- Override this method to set another priority.
-
- Valind only Mac. Not valid on iOS
- */
--(NSInteger) keyboardDelegatePriority;
-
-/** priority of the touch event delegate.
- Default 0.
- Override this method to set another priority.
-
- Valind only Mac. Not valid on iOS
- */
--(NSInteger) touchDelegatePriority;
-
-#endif // mac
-
+@interface CCLayer : CCNode
 
 @end
 
@@ -152,14 +52,12 @@
  - opacity
  - RGB colors
  */
-@interface CCLayerColor : CCLayer <CCRGBAProtocol, CCBlendProtocol>
+@interface CCLayerColor : CCNodeRGBA <CCBlendProtocol>
 {
-	GLubyte		opacity_;
-	ccColor3B	color_;
-	ccVertex2F	squareVertices_[4];
-	ccColor4F	squareColors_[4];
+	ccVertex2F	_squareVertices[4];
+	ccColor4F	_squareColors[4];
 
-	ccBlendFunc	blendFunc_;
+	ccBlendFunc	_blendFunc;
 }
 
 /** creates a CCLayer with color, width and height in Points*/
@@ -183,10 +81,6 @@
  */
 -(void) changeWidth:(GLfloat)w height:(GLfloat)h;
 
-/** Opacity: conforms to CCRGBAProtocol protocol */
-@property (nonatomic,readonly) GLubyte opacity;
-/** Opacity: conforms to CCRGBAProtocol protocol */
-@property (nonatomic,readonly) ccColor3B color;
 /** BlendFunction. Conforms to CCBlendProtocol protocol */
 @property (nonatomic,readwrite) ccBlendFunc blendFunc;
 @end
@@ -216,11 +110,11 @@ the background.
  */
 @interface CCLayerGradient : CCLayerColor
 {
-	ccColor3B endColor_;
-	GLubyte startOpacity_;
-	GLubyte endOpacity_;
-	CGPoint vector_;
-	BOOL	compressedInterpolation_;
+	ccColor3B _endColor;
+	GLubyte _startOpacity;
+	GLubyte _endOpacity;
+	CGPoint _vector;
+	BOOL	_compressedInterpolation;
 }
 
 /** Creates a full-screen CCLayer with a gradient between start and end. */
@@ -260,12 +154,20 @@ the background.
  */
 @interface CCLayerMultiplex : CCLayer
 {
-	unsigned int enabledLayer_;
-	NSMutableArray *layers_;
+	unsigned int _enabledLayer;
+	NSMutableArray *_layers;
 }
 
+/** creates a CCMultiplexLayer with an array of layers.
+ @since v2.1
+ */
++(id) layerWithArray:(NSArray*)arrayOfLayers;
 /** creates a CCMultiplexLayer with one or more layers using a variable argument list. */
 +(id) layerWithLayers: (CCLayer*) layer, ... NS_REQUIRES_NIL_TERMINATION;
+/** initializes a CCMultiplexLayer with an array of layers
+ @since v2.1
+ */
+-(id) initWithArray:(NSArray*)arrayOfLayers;
 /** initializes a MultiplexLayer with one or more layers using a variable argument list. */
 -(id) initWithLayers: (CCLayer*) layer vaList:(va_list) params;
 /** switches to a certain layer indexed by n.

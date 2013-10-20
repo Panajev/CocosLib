@@ -26,20 +26,20 @@
 
 // Only compile this code on iOS. These files should NOT be included on your Mac project.
 // But in case they are included, it won't be compiled.
-#import "../../ccMacros.h"
+#import "ccMacros.h"
+
 #ifdef __CC_PLATFORM_IOS
 
-#import "../../CCDirector.h"
-#import "kazmath/mat4.h"
+#import "CCDirector.h"
 
-@class CCTouchDispatcher;
+#pragma clang diagnostic push COCOS2D
+#pragma clang diagnostic ignored "-Wignored-qualifiers"
+#import "kazmath/mat4.h"
+#pragma clang diagnostic pop COCOS2D
 
 /** CCDirector extensions for iPhone
  */
 @interface CCDirector (iOSExtension)
-
-/** sets the CCTouchDispatcher (iOS only) */
-@property (nonatomic,readwrite,retain) CCTouchDispatcher * touchDispatcher;
 
 /** The size in pixels of the surface. It could be different than the screen size.
  High-res devices might have a higher surface size than the screen size.
@@ -55,13 +55,16 @@
  It will enable Retina Display on iPhone4 and iPod Touch 4.
  It will return YES, if it could enabled it, otherwise it will return NO.
 
- This is the recommened way to enable Retina Display.
+ This is the recommended way to enable Retina Display.
  @since v0.99.5
  */
 -(BOOL) enableRetinaDisplay:(BOOL)enableRetina;
 
 /** returns the content scale factor */
 -(CGFloat) contentScaleFactor;
+
+/** converts a UITouch to a GL point */
+-(CGPoint)convertTouchToGL:(UITouch*)touch;
 @end
 
 #pragma mark -
@@ -73,10 +76,13 @@
 @interface CCDirectorIOS : CCDirector
 {
 	/* contentScaleFactor could be simulated */
-	BOOL	isContentScaleSupported_;
+	BOOL	_isContentScaleSupported;
 	
-	CCTouchDispatcher	*touchDispatcher_;
 }
+
+// XXX: At least one method is needed for BridgeSupport
+- (void) drawScene;
+
 @end
 
 /** DisplayLinkDirector is a Director that synchronizes timers with the refresh rate of the display.
@@ -92,8 +98,8 @@
  */
 @interface CCDirectorDisplayLink : CCDirectorIOS
 {
-	CADisplayLink	*displayLink_;
-	CFTimeInterval	lastDisplayTime_;
+	CADisplayLink	*_displayLink;
+	CFTimeInterval	_lastDisplayTime;
 }
 -(void) mainLoop:(id)sender;
 @end

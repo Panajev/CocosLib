@@ -40,11 +40,11 @@
  */
 @interface CCPointArray : NSObject <NSCopying>
 {
-	NSMutableArray *controlPoints_;
+	NSMutableArray	*_controlPoints;
 }
 
 /** Array that contains the control points */
-@property (nonatomic,readwrite,retain) NSMutableArray *controlPoints;
+@property (nonatomic,readwrite,strong) NSMutableArray *controlPoints;
 
 /** creates and initializes a Points array with capacity */
  +(id) arrayWithCapacity:(NSUInteger)capacity;
@@ -62,7 +62,7 @@
 -(void) replaceControlPoint:(CGPoint)controlPoint atIndex:(NSUInteger)index;
 
 /** get the value of a controlPoint at a given index */
--(CGPoint) getControlPointAtIndex:(NSInteger)index;
+-(CGPoint) getControlPointAtIndex:(NSUInteger)index;
 
 /** deletes a control point at a given index */
 -(void) removeControlPointAtIndex:(NSUInteger)index;
@@ -82,13 +82,15 @@
  */
 @interface CCCardinalSplineTo : CCActionInterval
 {
-	CCPointArray		*points_;
-	CGFloat			deltaT_;
-	CGFloat			tension_;
+	CCPointArray	*_points;
+	CGFloat			_deltaT;
+	CGFloat			_tension;
+	CGPoint			_previousPosition;
+	CGPoint			_accumulatedDiff;
 }
 
 /** Array of control points */
- @property (nonatomic,readwrite,retain) CCPointArray *points;
+ @property (nonatomic,readwrite,strong) CCPointArray *points;
 
 /** creates an action with a Cardinal Spline array of points and tension */
 +(id) actionWithDuration:(ccTime)duration points:(CCPointArray*)points tension:(CGFloat)tension;
@@ -103,8 +105,10 @@
  */
 @interface CCCardinalSplineBy : CCCardinalSplineTo
 {
-	CGPoint				startPosition_;
+	CGPoint		_startPosition;
 }
+// XXX: To make BridgeSupport happy
+-(void) startWithTarget:(id)target;
 @end
 
 /** An action that moves the target with a CatmullRom curve to a destination point.
@@ -135,5 +139,13 @@
 -(id) initWithDuration:(ccTime)dt points:(CCPointArray*)points;
 @end
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /** Returns the Cardinal Spline position for a given set of control points, tension and time */
- CGPoint ccCardinalSplineAt( CGPoint p0, CGPoint p1, CGPoint p2, CGPoint p3, CGFloat tension, ccTime t );
+CGPoint ccCardinalSplineAt( CGPoint p0, CGPoint p1, CGPoint p2, CGPoint p3, CGFloat tension, ccTime t );
+
+#ifdef __cplusplus
+}
+#endif

@@ -5,6 +5,7 @@
  *
  * Copyright (c) 2008-2010 Ricardo Quesada
  * Copyright (c) 2011 Zynga Inc.
+ * Copyright (c) 2013 Lars Birkemose
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -30,19 +31,25 @@
 #import "CCProtocols.h"
 #import "ccConfig.h"
 #import "ccGLStateCache.h"
-#import "Support/CCArray.h"
+
+#pragma clang diagnostic pop COCOS2D
+#pragma clang diagnostic ignored "-Wignored-qualifiers"
 #import "kazmath/kazmath.h"
+#pragma clang diagnostic push COCOS2D
+
+#import "CCResponder.h"
 
 enum {
 	kCCNodeTagInvalid = -1,
 };
 
-@class CCCamera;
+@class CCScene;
 @class CCGridBase;
 @class CCGLProgram;
 @class CCScheduler;
 @class CCActionManager;
 @class CCAction;
+@class CCPhysicsBody;
 
 /** CCNode is the main element. Anything thats gets drawn or contains things that get drawn is a CCNode.
  The most popular CCNodes are: CCScene, CCLayer, CCSprite, CCMenu.
@@ -63,7 +70,6 @@ enum {
  - position
  - scale (x, y)
  - rotation (in degrees, clockwise)
- - CCCamera (an interface to gluLookAt )
  - CCGridBase (to do mesh transformations)
  - anchor point
  - size
@@ -90,94 +96,84 @@ enum {
 
  Order in transformations with grid enabled
  -# The node will be translated (position)
- -# The node will be rotated (rotation)
+ -# The node will be rotated (rotation, rotationX, rotationY)
  -# The node will be skewed (skewX, skewY)
  -# The node will be scaled (scale, scaleX, scaleY)
  -# The grid will capture the screen
  -# The node will be moved according to the camera values (camera)
  -# The grid will render the captured screen
-
- Camera:
- - Each node has a camera. By default it points to the center of the CCNode.
  */
-@interface CCNode : NSObject
-{
+@interface CCNode : CCResponder < CCResponderProtocol > {
 	// rotation angle
-	float rotation_;
+	float _rotationalSkewX, _rotationalSkewY;
 
 	// scaling factors
-	float scaleX_, scaleY_;
+	float _scaleX, _scaleY;
 
 	// openGL real Z vertex
-	float vertexZ_;
+	float _vertexZ;
 
 	// position of the node
-	CGPoint position_;
+	CGPoint _position;
 
 	// skew angles
-	float skewX_, skewY_;
+	float _skewX, _skewY;
 
 	// anchor point in points
-	CGPoint anchorPointInPoints_;
+	CGPoint _anchorPointInPoints;
 	// anchor point normalized (NOT in points)
-	CGPoint anchorPoint_;
+	CGPoint _anchorPoint;
 
 	// untransformed size of the node
-	CGSize	contentSize_;
+	CGSize	_contentSize;
 
 	// transform
-	CGAffineTransform transform_, inverse_;
-
-	// a Camera
-	CCCamera *camera_;
+	CGAffineTransform _transform, _inverse;
+	BOOL _isTransformDirty;
+	BOOL _isInverseDirty;
 
 	// a Grid
-	CCGridBase *grid_;
+	CCGridBase *_grid;
 
 	// z-order value
-	NSInteger zOrder_;
+	NSInteger _zOrder;
 
 	// array of children
-	CCArray *children_;
+	NSMutableArray *_children;
 
-	// weakref to parent
-	CCNode *parent_;
+	// weak ref to parent
+	CCNode *__unsafe_unretained _parent;
 
 	// a tag. any number you want to assign to the node
-	NSInteger tag_;
+	NSInteger _tag;
 
 	// user data field
-	void *userData_;
-	id userObject_;
+	id _userObject;
 
 	// Shader
-	CCGLProgram	*shaderProgram_;
+	CCGLProgram	*_shaderProgram;
 
 	// Server side state
-	ccGLServerState glServerState_;
+	ccGLServerState _glServerState;
 
 	// used to preserve sequence while sorting children with the same zOrder
-	NSUInteger orderOfArrival_;
+	NSUInteger _orderOfArrival;
 
 	// scheduler used to schedule timers and updates
-	CCScheduler		*scheduler_;
+	CCScheduler		*_scheduler;
 
 	// ActionManager used to handle all the actions
-	CCActionManager	*actionManager_;
+	CCActionManager	*_actionManager;
 
 	// Is running
-	BOOL isRunning_;
-
-	BOOL isTransformDirty_;
-	BOOL isInverseDirty_;
+	BOOL _isRunning;
 
 	// is visible
-	BOOL visible_;
-	// If YES, the Anchor Point will be (0,0) when you position the CCNode.
-	// Used by CCLayer and CCScene
-	BOOL ignoreAnchorPointForPosition_;
+	BOOL _visible;
 
-	BOOL isReorderChildDirty_;	
+	BOOL _isReorderChildDirty;
+    
+    CCPhysicsBody* _physicsBody;
 }
 
 /** The z order of the node relative to its "siblings": children of the same parent */
@@ -207,22 +203,37 @@ enum {
 @property(nonatomic,readwrite,assign) float skewY;
 /** The rotation (angle) of the node in degrees. 0 is the default rotation angle. Positive values rotate node CW. */
 @property(nonatomic,readwrite,assign) float rotation;
+/** The rotation (angle) of the node in degrees. 0 is the default rotation angle. Positive values rotate node CW. It only modifies the X rotation performing a horizontal rotational skew . */
+@property(nonatomic,readwrite,assign) float rotationalSkewX;
+/** The rotation (angle) of the node in degrees. 0 is the default rotation angle. Positive values rotate node CW. It only modifies the Y rotation performing a vertical rotational skew . */
+@property(nonatomic,readwrite,assign) float rotationalSkewY;
+
 /** The scale factor of the node. 1.0 is the default scale factor. It modifies the X and Y scale at the same time. */
 @property(nonatomic,readwrite,assign) float scale;
 /** The scale factor of the node. 1.0 is the default scale factor. It only modifies the X scale factor. */
 @property(nonatomic,readwrite,assign) float scaleX;
 /** The scale factor of the node. 1.0 is the default scale factor. It only modifies the Y scale factor. */
 @property(nonatomic,readwrite,assign) float scaleY;
-/** Position (x,y) of the node in points. (0,0) is the left-bottom corner. */
+
+@property (nonatomic,readonly) float scaleInPoints;
+@property (nonatomic,readonly) float scaleXInPoints;
+@property (nonatomic,readonly) float scaleYInPoints;
+
+@property (nonatomic,assign) CCScaleType scaleType;
+@property (nonatomic,readonly) BOOL isPhysicsNode;
+
+/** Position (x,y) of the node in the unit specified by the positionType property. The distance is measured from one of the corners of the node's parent container, which corner is specified by the positionType property. Default setting is referencing the bottom left corner in points. */
 @property(nonatomic,readwrite,assign) CGPoint position;
-/** A CCCamera object that lets you move the node using a gluLookAt */
-@property(nonatomic,readonly) CCCamera* camera;
+/** Position (x,y) of the node in points from the bottom left corner */
+@property(nonatomic,readonly) CGPoint positionInPoints;
+/** Defines the position type used for the X component of the position property */
+@property(nonatomic,readwrite,assign) CCPositionType positionType;
 /** Array of children */
-@property(nonatomic,readonly) CCArray *children;
+@property(nonatomic,readonly) NSArray *children;
 /** A CCGrid object that is used when applying effects */
-@property(nonatomic,readwrite,retain) CCGridBase* grid;
+@property(nonatomic,readwrite,strong) CCGridBase* grid;
 /** Whether of not the node is visible. Default is YES */
-@property(nonatomic,readwrite,assign) BOOL visible;
+@property( nonatomic,readwrite,assign) BOOL visible;
 /** anchorPoint is the point around which all transformations and positioning manipulations take place.
  It's like a pin in the node where it is "attached" to its parent.
  The anchorPoint is normalized, like a percentage. (0,0) means the bottom-left corner and (1,1) means the top-right corner.
@@ -236,32 +247,34 @@ enum {
  */
 @property(nonatomic,readonly) CGPoint anchorPointInPoints;
 
-/** The untransformed size of the node in Points
- The contentSize remains the same no matter the node is scaled or rotated.
- All nodes has a size. Layer and Scene has the same size of the screen.
+/** The untransformed size of the node in the unit specified by contentSizeType property. The contentSize remains the same no matter the node is scaled or rotated.
  @since v0.8
  */
-@property (nonatomic,readwrite) CGSize contentSize;
+@property (nonatomic,readwrite,assign) CGSize contentSize;
+/** The untransformed size of the node in Points. The contentSize remains the same no matter the node is scaled or rotated. */
+@property (nonatomic,readonly) CGSize contentSizeInPoints;
+/** Defines the contentSize type used for the widht and height component of the contentSize property. */
+@property (nonatomic,readwrite,assign) CCContentSizeType contentSizeType;
+
+/** The scene this node is added to, or nil if it's not part of a scene. */
+@property(nonatomic, readonly) CCScene *scene;
+
+/** The physics body (if any) that this node is attached to. */
+@property(nonatomic, strong) CCPhysicsBody *physicsBody;
 
 /** whether or not the node is running */
 @property(nonatomic,readonly) BOOL isRunning;
 /** A weak reference to the parent */
-@property(nonatomic,readwrite,assign) CCNode* parent;
-/**  If YES, the Anchor Point will be (0,0) when you position the CCNode.
- Used by CCLayer and CCScene.
- */
-@property(nonatomic,readwrite,assign) BOOL ignoreAnchorPointForPosition;
+@property(nonatomic,readwrite,unsafe_unretained) CCNode* parent;
 /** A tag used to identify the node easily */
 @property(nonatomic,readwrite,assign) NSInteger tag;
-/** A custom user data pointer */
-@property(nonatomic,readwrite,assign) void* userData;
 /** Similar to userData, but instead of holding a void* it holds an id */
-@property(nonatomic,readwrite,retain) id userObject;
+@property(nonatomic,readwrite,strong) id userObject;
 
 /** Shader Program
  @since v2.0
  */
-@property(nonatomic,readwrite,retain) CCGLProgram *shaderProgram;
+@property(nonatomic,readwrite,strong) CCGLProgram *shaderProgram;
 
 /** used internally for zOrder sorting, don't change this manually */
 @property(nonatomic,readwrite) NSUInteger orderOfArrival;
@@ -275,14 +288,38 @@ enum {
  IMPORTANT: If you set a new CCActionManager, then previously created actions are going to be removed.
  @since v2.0
  */
-@property (nonatomic, readwrite, retain) CCActionManager *actionManager;
+@property (nonatomic, readwrite, strong) CCActionManager *actionManager;
 
 /** CCScheduler used to schedule all "updates" and timers.
  IMPORTANT: If you set a new CCScheduler, then previously created timers/update are going to be removed.
  @since v2.0
  */
-@property (nonatomic, readwrite, retain) CCScheduler *scheduler;
+@property (nonatomic, readwrite, strong) CCScheduler *scheduler;
 
+/** Enabled user interaction on a node, like touch
+ @since v2.5
+ */
+@property ( nonatomic, assign, getter = isUserInteractionEnabled ) BOOL userInteractionEnabled;
+
+/** Enabled multiple touches inside a single node
+ @since v2.5
+ */
+@property ( nonatomic, assign, getter = isMultipleTouchEnabled ) BOOL multipleTouchEnabled;
+
+/** Locks the touch to the node if touch started outside
+ If a touch is moved inside a non locked node, a touchesBegan will be generated
+ @since v2.5
+ */
+@property (nonatomic, assign) BOOL claimsUserInteraction;
+
+/** Expands ( or contracts ) the hit area of the node
+ hitAreaExpansion = 0 => hit area has no size
+ hitAreaExpansion = 1 => hit area has same size as sprite (default)
+ hitAreaExpansion = 2 => hit area has double width and double height
+ @since v2.5
+ */
+@property (nonatomic,assign) float hitAreaExpansion;
+ 
 // initializators
 /** allocates and initializes a node.
  The node will be created as "autorelease".
@@ -291,8 +328,7 @@ enum {
 /** initializes the node */
 -(id) init;
 
-
-// scene managment
+// scene management
 
 /** Event that is called every time the CCNode enters the 'stage'.
  If the CCNode enters the 'stage' with a transition, this event is called when the transition starts.
@@ -342,21 +378,42 @@ enum {
 
 // composition: REMOVE
 
+/** Remove itself from its parent node forcing a cleanup.
+ If the node orphan, then nothing happens.
+ @since v2.1
+ */
+-(void) removeFromParent;
+
 /** Remove itself from its parent node. If cleanup is YES, then also remove all actions and callbacks.
  If the node orphan, then nothing happens.
  @since v0.99.3
  */
 -(void) removeFromParentAndCleanup:(BOOL)cleanup;
 
+/** Removes a child from the container forcing a cleanup
+ @since v2.1
+ */
+-(void) removeChild:(CCNode*)child;
+
 /** Removes a child from the container. It will also cleanup all running actions depending on the cleanup parameter.
  @since v0.7.1
  */
 -(void) removeChild: (CCNode*)node cleanup:(BOOL)cleanup;
 
+/** Removes a child from the container by tag value forcing a cleanup.
+ @since v2.1
+ */
+-(void) removeChildByTag:(NSInteger) tag;
+
 /** Removes a child from the container by tag value. It will also cleanup all running actions depending on the cleanup parameter
  @since v0.7.1
  */
 -(void) removeChildByTag:(NSInteger) tag cleanup:(BOOL)cleanup;
+
+/** Removes all children from the container forcing a cleanup.
+ @since v2.1
+ */
+-(void) removeAllChildren;
 
 /** Removes all children from the container and do a cleanup all running actions depending on the cleanup parameter.
  @since v0.7.1
@@ -454,7 +511,7 @@ enum {
 
 /** schedules the "update" method. It will use the order number 0. This method will be called every frame.
  Scheduled methods with a lower order value will be called before the ones that have a higher order value.
- Only one "udpate" method could be scheduled per node.
+ Only one "update" method could be scheduled per node.
 
  @since v0.99.3
  */
@@ -462,7 +519,7 @@ enum {
 
 /** schedules the "update" selector with a custom priority. This selector will be called every frame.
  Scheduled selectors with a lower priority will be called before the ones that have a higher value.
- Only one "udpate" selector could be scheduled per node (You can't have 2 'update' selectors).
+ Only one "update" selector could be scheduled per node (You can't have 2 'update' selectors).
 
  @since v0.99.3
  */
@@ -473,7 +530,6 @@ enum {
  @since v0.99.3
  */
 -(void) unscheduleUpdate;
-
 
 /** schedules a selector.
  The scheduled selector will be ticked every frame
@@ -515,6 +571,9 @@ enum {
  */
 -(void) pauseSchedulerAndActions;
 
+/* Update will be called automatically every frame if "scheduleUpdate" is called, and the node is "live"
+ */
+-(void) update:(ccTime)delta;
 
 // transformation methods
 
@@ -523,32 +582,45 @@ enum {
  @since v0.7.1
  */
 - (CGAffineTransform)nodeToParentTransform;
+
+- (CGPoint) convertPositionToPoints:(CGPoint)position type:(CCPositionType)type;
+- (CGPoint) convertPositionFromPoints:(CGPoint)positionInPoints type:(CCPositionType) type;
+
+- (CGSize) convertContentSizeToPoints:(CGSize)contentSize type:(CCContentSizeType) type;
+- (CGSize) convertContentSizeFromPoints:(CGSize)pointSize type:(CCContentSizeType) type;
+
 /** Returns the matrix that transform parent's space coordinates to the node's (local) space coordinates.
  The matrix is in Pixels.
  @since v0.7.1
  */
 - (CGAffineTransform)parentToNodeTransform;
-/** Retrusn the world affine transform matrix. The matrix is in Pixels.
+
+/** Returns the world affine transform matrix. The matrix is in Pixels.
  @since v0.7.1
  */
 - (CGAffineTransform)nodeToWorldTransform;
+
 /** Returns the inverse world affine transform matrix. The matrix is in Pixels.
  @since v0.7.1
  */
 - (CGAffineTransform)worldToNodeTransform;
+
 /** Converts a Point to node (local) space coordinates. The result is in Points.
  @since v0.7.1
  */
 - (CGPoint)convertToNodeSpace:(CGPoint)worldPoint;
+
 /** Converts a Point to world space coordinates. The result is in Points.
  @since v0.7.1
  */
 - (CGPoint)convertToWorldSpace:(CGPoint)nodePoint;
+
 /** Converts a Point to node (local) space coordinates. The result is in Points.
  treating the returned/received node point as anchor relative.
  @since v0.7.1
  */
 - (CGPoint)convertToNodeSpaceAR:(CGPoint)worldPoint;
+
 /** Converts a local Point to world space coordinates.The result is in Points.
  treating the returned/received node point as anchor relative.
  @since v0.7.1
@@ -556,6 +628,7 @@ enum {
 - (CGPoint)convertToWorldSpaceAR:(CGPoint)nodePoint;
 
 #ifdef __CC_PLATFORM_IOS
+
 /** Converts a UITouch to node (local) space coordinates. The result is in Points.
  @since v0.7.1
  */
@@ -566,4 +639,38 @@ enum {
  */
 - (CGPoint)convertTouchToNodeSpaceAR:(UITouch *)touch;
 #endif // __CC_PLATFORM_IOS
+
+/** Compares two nodes in respect to zOrder and orderOfArrival (used for sorting sprites in display list) */
+- (NSComparisonResult) compareZOrderToNode:(CCNode*)node;
+
+/** check if a touch is inside the node
+ to expand or shrink the touch area of a node, override this method
+ @since v2.5
+ */
+- (BOOL)hitTestWithWorldPos:(CGPoint)pos;
+
+@end
+
+
+#pragma mark - CCNodeRGBA
+
+/** CCNodeRGBA is a subclass of CCNode that implements the CCRGBAProtocol protocol.
+
+ All features from CCNode are valid, plus the following new features:
+ - opacity
+ - RGB colors
+
+ Opacity/Color propagates into children that conform to the CCRGBAProtocol if cascadeOpacity/cascadeColor is enabled.
+ @since v2.1
+ */
+@interface CCNodeRGBA : CCNode <CCRGBAProtocol>
+{
+	GLubyte		_displayedOpacity, _realOpacity;
+	ccColor3B	_displayedColor, _realColor;
+	BOOL		_cascadeColorEnabled, _cascadeOpacityEnabled;
+}
+
+// XXX To make BridgeSupport happy
+-(GLubyte) opacity;
+
 @end

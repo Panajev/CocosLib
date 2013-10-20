@@ -36,24 +36,24 @@
  You can modify the frame of a CCSprite by doing:
 
 	CCSpriteFrame *frame = [CCSpriteFrame frameWithTexture:texture rect:rect offset:offset];
-	[sprite setDisplayFrame:frame];
+	[sprite setSpriteFrame:frame];
  */
 @interface CCSpriteFrame : NSObject <NSCopying>
 {
-	CGRect			rect_;
-	CGRect			rectInPixels_;
-	BOOL			rotated_;
-    CGPoint			offset_;
-	CGPoint			offsetInPixels_;
-	CGSize			originalSize_;
-	CGSize			originalSizeInPixels_;
-	CCTexture2D		*texture_;
-	NSString		*textureFilename_;
+	CGRect			_rect;
+	CGRect			_rectInPixels;
+	BOOL			_rotated;
+    CGPoint			_offset;
+	CGPoint			_offsetInPixels;
+	CGSize			_originalSize;
+	CGSize			_originalSizeInPixels;
+	CCTexture2D		*_texture;
+	NSString		*_textureFilename;
 }
 /** rect of the frame in points. If it is updated, then rectInPixels will be updated too. */
 @property (nonatomic,readwrite) CGRect rect;
 
-/** rect of the frame in pixels. If it is updated, then rect (points) will be udpated too. */
+/** rect of the frame in pixels. If it is updated, then rect (points) will be updated too. */
 @property (nonatomic,readwrite) CGRect rectInPixels;
 
 /** whether or not the rect of the frame is rotated ( x = x+width, y = y+height, width = height, height = width ) */
@@ -72,10 +72,13 @@
 @property (nonatomic,readwrite) CGSize originalSizeInPixels;
 
 /** texture of the frame */
-@property (nonatomic, retain, readwrite) CCTexture2D *texture;
+@property (nonatomic, strong, readwrite) CCTexture2D *texture;
 
 /** texture file name of the frame */
-@property (nonatomic, retain, readonly) NSString *textureFilename;
+@property (nonatomic, readonly) NSString *textureFilename;
+
+/** Retrieves a sprite frame from the sprite frame cache, or if no such sprite frame is know, attempts to create a sprite frame from an image of the same name. */
++(id) frameWithImageNamed:(NSString*)imageName;
 
 /** Create a CCSpriteFrame with a texture, rect in points.
  It is assumed that the frame was not trimmed.

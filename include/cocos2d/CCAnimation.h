@@ -43,18 +43,18 @@
  */
 @interface CCAnimationFrame : NSObject <NSCopying>
 {
-    CCSpriteFrame* spriteFrame_;
-    float delayUnits_;
-    NSDictionary *userInfo_;
+    CCSpriteFrame* _spriteFrame;
+    float _delayUnits;
+    NSDictionary *_userInfo;
 }
 /** CCSpriteFrameName to be used */
-@property (nonatomic, readwrite, retain) CCSpriteFrame* spriteFrame;
+@property (nonatomic, readwrite, strong) CCSpriteFrame* spriteFrame;
 
 /**  how many units of time the frame takes */
 @property (nonatomic, readwrite) float delayUnits;
 
 /**  A CCAnimationFrameDisplayedNotification notification will be broadcasted when the frame is displayed with this dictionary as UserInfo. If UserInfo is nil, then no notification will be broadcasted. */
-@property (nonatomic, readwrite, retain) NSDictionary *userInfo;
+@property (nonatomic, readwrite, strong) NSDictionary *userInfo;
 
 /** initializes the animation frame with a spriteframe, number of delay units and a notification user info */
 -(id) initWithSpriteFrame:(CCSpriteFrame*)spriteFrame delayUnits:(float)delayUnits userInfo:(NSDictionary*)userInfo;
@@ -70,11 +70,11 @@
  */
 @interface CCAnimation : NSObject <NSCopying>
 {
-	NSMutableArray	*frames_;
-	float			totalDelayUnits_;
-	float			delayPerUnit_;
-	BOOL			restoreOriginalFrame_;
-	NSUInteger		loops_;
+	NSMutableArray	*_frames;
+	float			_totalDelayUnits;
+	float			_delayPerUnit;
+	BOOL			_restoreOriginalFrame;
+	NSUInteger		_loops;
 }
 
 /** total Delay units of the CCAnimation. */
@@ -84,7 +84,7 @@
 /** duration in seconds of the whole animation. It is the result of totalDelayUnits * delayPerUnit */
 @property (nonatomic,readonly) float duration;
 /** array of CCAnimationFrames */
-@property (nonatomic,readwrite,retain) NSMutableArray *frames;
+@property (nonatomic,readwrite,strong) NSMutableArray *frames;
 /** whether or not it shall restore the original frame when the animation finishes */
 @property (nonatomic,readwrite) BOOL restoreOriginalFrame;
 /** how many times the animation is going to loop. 0 means animation is not animated. 1, animation is executed one time, ... */

@@ -54,7 +54,7 @@ public:
 
 	/// Register a contact filter to provide specific control over collision.
 	/// Otherwise the default filter is used (b2_defaultFilter). The listener is
-	/// owned by you and must remain in scope. 
+	/// owned by you and must remain in scope.
 	void SetContactFilter(b2ContactFilter* filter);
 
 	/// Register a contact event listener. The listener is owned by you and must
@@ -181,7 +181,7 @@ public:
 
 	/// Change the global gravity vector.
 	void SetGravity(const b2Vec2& gravity);
-	
+
 	/// Get the global gravity vector.
 	b2Vec2 GetGravity() const;
 
@@ -193,11 +193,6 @@ public:
 
 	/// Get the flag that controls automatic clearing of forces after each time step.
 	bool GetAutoClearForces() const;
-
-	/// Shift the world origin. Useful for large worlds.
-	/// The body shift formula is: position -= newOrigin
-	/// @param newOrigin the new origin with respect to the old origin
-	void ShiftOrigin(const b2Vec2& newOrigin);
 
 	/// Get the contact manager for testing.
 	const b2ContactManager& GetContactManager() const;

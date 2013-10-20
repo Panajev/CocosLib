@@ -26,13 +26,11 @@
 
 // Only compile this code on Mac. These files should not be included on your iOS project.
 // But in case they are included, it won't be compiled.
-#import "../../ccMacros.h"
+#import "ccMacros.h"
 #ifdef __CC_PLATFORM_MAC
 
 #import <QuartzCore/CVDisplayLink.h>
-#import "../../CCDirector.h"
-
-@class CCEventDispatcher;
+#import "CCDirector.h"
 
 enum  {
 	/// If the window is resized, it won't be autoscaled
@@ -42,8 +40,6 @@ enum  {
 };
 
 @interface CCDirector (MacExtension)
-/** sets the CCEventDispatcher (Mac only) */
-@property (nonatomic, readwrite, retain) CCEventDispatcher* eventDispatcher;
 
 /** converts an NSEvent to GL coordinates (Mac only) */
 -(CGPoint) convertEventToGL:(NSEvent*)event;
@@ -54,20 +50,17 @@ enum  {
  */
 @interface CCDirectorMac : CCDirector
 {
-	BOOL			isFullScreen_;
-	int				resizeMode_;
-	CGPoint			winOffset_;
-    CGSize			originalWinSize_;
+	BOOL			_isFullScreen;
+	int				_resizeMode;
+	CGPoint			_winOffset;
+    CGSize			_originalWinSize;
 
-	NSWindow		*fullScreenWindow_;
-
-	// Event Dispatcher
-	CCEventDispatcher	*eventDispatcher_;
+	NSWindow		*_fullScreenWindow;
 
 	// cache
-	NSWindow		*windowGLView_;
-    NSView          *superViewGLView_;
-    NSRect          originalWinRect_; // Original size and position
+	NSWindow		*_windowGLView;
+    NSView          *_superViewGLView;
+    NSRect          _originalWinRect; // Original size and position
 }
 
 // whether or not the view is in fullscreen mode
@@ -81,7 +74,7 @@ enum  {
 /** Sets the view in fullscreen or window mode */
 - (void) setFullScreen:(BOOL)fullscreen;
 
-/** Converts window size coordiantes to logical coordinates.
+/** Converts window size coordinates to logical coordinates.
  Useful only if resizeMode is kCCDirectorResize_Scale.
  If resizeMode is kCCDirectorResize_NoScale, then no conversion will be done.
 */

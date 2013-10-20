@@ -34,13 +34,13 @@
  *
  * <hr>
  *
- * @todo A native english speaker should check the grammar. We need your help!
+ * @todo A native English speaker should check the grammar. We need your help!
  *
  */
 
 // 0x00 HI ME LO
-// 00   02 00 00
-#define COCOS2D_VERSION 0x00020000
+// 00   02 05 00
+#define COCOS2D_VERSION 0x00020500
 
 
 //
@@ -53,7 +53,6 @@
 #import "CCActionInstant.h"
 #import "CCActionInterval.h"
 #import "CCActionEase.h"
-#import "CCActionCamera.h"
 #import "CCActionTween.h"
 #import "CCActionEase.h"
 #import "CCActionTiledGrid.h"
@@ -69,6 +68,7 @@
 #import "CCSpriteFrame.h"
 #import "CCSpriteBatchNode.h"
 #import "CCSpriteFrameCache.h"
+#import "CCSprite9Slice.h"
 
 #import "CCLabelTTF.h"
 #import "CCLabelBMFont.h"
@@ -76,6 +76,7 @@
 
 #import "CCParticleSystem.h"
 #import "CCParticleSystemQuad.h"
+#import "CCParticleExamples.h"
 #import "CCParticleBatchNode.h"
 
 #import "CCTexture2D.h"
@@ -84,8 +85,6 @@
 #import "CCTextureAtlas.h"
 
 #import "CCTransition.h"
-#import "CCTransitionPageTurn.h"
-#import "CCTransitionProgress.h"
 
 #import "CCTMXTiledMap.h"
 #import "CCTMXLayer.h"
@@ -99,7 +98,6 @@
 #import "CCDrawingPrimitives.h"
 #import "CCScene.h"
 #import "CCScheduler.h"
-#import "CCCamera.h"
 #import "CCProtocols.h"
 #import "CCNode.h"
 #import "CCNode+Debug.h"
@@ -111,12 +109,21 @@
 #import "CCRenderTexture.h"
 #import "CCMotionStreak.h"
 #import "CCConfiguration.h"
+#import "CCDrawNode.h"
+#import "CCClippingNode.h"
+
+#import "ccFPSImages.h"
 
 // Shaders
 #import "CCGLProgram.h"
 #import "ccGLStateCache.h"
 #import "CCShaderCache.h"
 #import "ccShaders.h"
+
+// Physics
+#import "CCPhysicsBody.h"
+#import "CCPhysicsJoint.h"
+#import "CCPhysicsNode.h"
 
 //
 // cocos2d macros
@@ -134,17 +141,14 @@
 #import "Platforms/CCNS.h"
 
 #ifdef __CC_PLATFORM_IOS
-#import "Platforms/iOS/CCTouchDispatcher.h"
-#import "Platforms/iOS/CCTouchDelegateProtocol.h"
-#import "Platforms/iOS/CCTouchHandler.h"
 #import "Platforms/iOS/CCGLView.h"
 #import "Platforms/iOS/CCDirectorIOS.h"
+#import "Platforms/iOS/UITouch+CC.h"
 
 #elif defined(__CC_PLATFORM_MAC)
 #import "Platforms/Mac/CCGLView.h"
 #import "Platforms/Mac/CCDirectorMac.h"
 #import "Platforms/Mac/CCWindow.h"
-#import "Platforms/Mac/CCEventDispatcher.h"
 #endif
 
 //
@@ -153,23 +157,36 @@
 #import "Support/OpenGL_Internal.h"
 #import "Support/CCFileUtils.h"
 #import "Support/CGPointExtension.h"
-#import "Support/ccCArray.h"
-#import "Support/CCArray.h"
 #import "Support/ccUtils.h"
 #import "Support/TransformUtils.h"
 #import "Support/CCProfiling.h"
+#import "Support/NSThread+performBlock.h"
+#import "Support/uthash.h"
+#import "Support/utlist.h"
 
 //
 // external
 //
+#pragma clang diagnostic push COCOS2D
+#pragma clang diagnostic ignored "-Wignored-qualifiers"
 #import "kazmath/kazmath.h"
 #import "kazmath/GL/matrix.h"
+#pragma clang diagnostic pop COCOS2D
 
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 // free functions
 NSString * cocos2dVersion(void);
+extern const char * cocos2d_version;
 
+#ifdef __cplusplus
+}
+#endif
+
+	
 #ifdef __CC_PLATFORM_IOS
 #ifndef __IPHONE_4_0
 #error "If you are targeting iPad, you should set BASE SDK = 4.0 (or 4.1, or 4.2), and set the 'iOS deploy target' = 3.2"

@@ -27,11 +27,16 @@
 #import "ccConfig.h"
 #import "ccTypes.h"
 #import "ccMacros.h"
+
 #import "CCProtocols.h"
 #import "Platforms/CCGL.h"
-#import "kazmath/mat4.h"
 
-#import "CCTransitionOrientationType.h"
+#pragma clang diagnostic push COCOS2D
+#pragma clang diagnostic ignored "-Wignored-qualifiers"
+#import "kazmath/mat4.h"
+#pragma clang diagnostic pop COCOS2D
+
+#import "CCResponderManager.h"
 
 /** @typedef ccDirectorProjection
  Possible OpenGL projections used by director
@@ -56,7 +61,7 @@ typedef enum {
 @class CCScene;
 @class CCScheduler;
 @class CCActionManager;
-
+@class CCTransition;
 
 #ifdef __CC_PLATFORM_IOS
 #define CC_VIEWCONTROLLER UIViewController
@@ -67,7 +72,7 @@ typedef enum {
 /**Class that creates and handle the main Window and manages how
 and when to execute the Scenes.
 
- The CCDirector is also resposible for:
+ The CCDirector is also responsible for:
   - initializing the OpenGL ES context
   - setting the OpenGL pixel format (default on is RGB565)
   - setting the OpenGL buffer depth (default one is 0-bit)
@@ -85,74 +90,74 @@ and when to execute the Scenes.
 @interface CCDirector : CC_VIEWCONTROLLER
 {
 	// internal timer
-	NSTimeInterval animationInterval_;
-	NSTimeInterval oldAnimationInterval_;
+	NSTimeInterval _animationInterval;
+	NSTimeInterval _oldAnimationInterval;
 
 	/* stats */
-	BOOL	displayStats_;
+	BOOL	_displayStats;
 
-	NSUInteger frames_;
-	NSUInteger totalFrames_;
-	ccTime secondsPerFrame_;
+	NSUInteger _frames;
+	NSUInteger _totalFrames;
+	ccTime _secondsPerFrame;
 
-	ccTime		accumDt_;
-	ccTime		frameRate_;
-	CCLabelAtlas *FPSLabel_;
-	CCLabelAtlas *SPFLabel_;
-	CCLabelAtlas *drawsLabel_;
+	ccTime		_accumDt;
+	ccTime		_frameRate;
+	CCLabelAtlas *_FPSLabel;
+	CCLabelAtlas *_SPFLabel;
+	CCLabelAtlas *_drawsLabel;
 
 	/* is the running scene paused */
-	BOOL isPaused_;
+	BOOL _isPaused;
     
     /* Is the director running */
-    BOOL isAnimating_;
+    BOOL _isAnimating;
 
 	/* The running scene */
-	CCScene *runningScene_;
+	CCScene *_runningScene;
 
 	/* This object will be visited after the scene. Useful to hook a notification node */
-	id notificationNode_;
+	id _notificationNode;
 
 	/* will be the next 'runningScene' in the next frame
 	 nextScene is a weak reference. */
-	CCScene *nextScene_;
+	CCScene *_nextScene;
 
 	/* If YES, then "old" scene will receive the cleanup message */
-	BOOL	sendCleanupToScene_;
+	BOOL	_sendCleanupToScene;
 
 	/* scheduled scenes */
-	NSMutableArray *scenesStack_;
+	NSMutableArray *_scenesStack;
 
 	/* last time the main loop was updated */
-	struct timeval lastUpdate_;
+	struct timeval _lastUpdate;
 	/* delta time since last tick to main loop */
-	ccTime dt;
+	ccTime _dt;
 	/* whether or not the next delta time will be zero */
-	BOOL nextDeltaTimeZero_;
+	BOOL _nextDeltaTimeZero;
 
 	/* projection used */
-	ccDirectorProjection projection_;
+	ccDirectorProjection _projection;
 
 	/* CCDirector delegate */
-	id<CCDirectorDelegate>	delegate_;
+	id<CCDirectorDelegate>	__unsafe_unretained _delegate;
 
 	/* window size in points */
-	CGSize	winSizeInPoints_;
+	CGSize	_winSizeInPoints;
 
 	/* window size in pixels */
-	CGSize	winSizeInPixels_;
+	CGSize	_winSizeInPixels;
 
 	/* the cocos2d running thread */
-	NSThread	*runningThread_;
+	NSThread	*__unsafe_unretained _runningThread;
 
 	/* scheduler associated with this director */
-	CCScheduler *scheduler_;
+	CCScheduler *_scheduler;
 
 	/* action manager associated with this director */
-	CCActionManager *actionManager_;
+	CCActionManager *_actionManager;
 	
 	/*  OpenGLView. On iOS it is a copy of self.view */
-	CCGLView		*view_;
+	CCGLView		*__view;
 }
 
 /** returns the cocos2d thread.
@@ -170,7 +175,7 @@ and when to execute the Scenes.
 /** whether or not the next delta time will be zero */
 @property (nonatomic,readwrite,assign) BOOL nextDeltaTimeZero;
 /** Whether or not the Director is paused */
-@property (nonatomic,readonly) BOOL isPaused;
+@property (nonatomic,readonly,getter=isPaused) BOOL paused;
 /** Whether or not the Director is active (animating) */
 @property (nonatomic,readonly) BOOL isAnimating;
 /** Sets an OpenGL projection */
@@ -179,6 +184,12 @@ and when to execute the Scenes.
 @property (nonatomic,readonly) NSUInteger	totalFrames;
 /** seconds per frame */
 @property (nonatomic, readonly) ccTime secondsPerFrame;
+
+/** Sets the touch manager
+ @since v2.5
+ */
+@property ( nonatomic, strong ) CCResponderManager* responderManager;
+
 
 /** Whether or not the replaced scene will receive the cleanup message.
  If the new scene is pushed, then the old scene won't receive the "cleanup" message.
@@ -192,22 +203,27 @@ and when to execute the Scenes.
  Useful to hook a notification object, like CCNotifications (http://github.com/manucorporat/CCNotifications)
  @since v0.99.5
  */
-@property (nonatomic, readwrite, retain) id	notificationNode;
+@property (nonatomic, readwrite, strong) id	notificationNode;
 
-/** CCDirector delegate. It shall implemente the CCDirectorDelegate protocol
+/** CCDirector delegate. It shall implement the CCDirectorDelegate protocol
  @since v0.99.5
  */
-@property (nonatomic, readwrite, retain) id<CCDirectorDelegate> delegate;
+@property (nonatomic, readwrite, unsafe_unretained) id<CCDirectorDelegate> delegate;
 
 /** CCScheduler associated with this director
  @since v2.0
  */
-@property (nonatomic,readwrite,retain) CCScheduler *scheduler;
+@property (nonatomic,readwrite,strong) CCScheduler *scheduler;
 
 /** CCActionManager associated with this director
  @since v2.0
  */
-@property (nonatomic,readwrite,retain) CCActionManager *actionManager;
+@property (nonatomic,readwrite,strong) CCActionManager *actionManager;
+
+/** Position scaling factor, default is 2 for tablets and 1 for phones. Positions and content sizes are scale by this factor if the position type is set to scale.
+ @since v2.5
+ */
+@property (nonatomic,readwrite,assign) float positionScaleFactor;
 
 /** returns a shared instance of the director */
 +(CCDirector*)sharedDirector;
@@ -227,8 +243,11 @@ and when to execute the Scenes.
 /** changes the projection size */
 -(void) reshapeProjection:(CGSize)newWindowSize;
 
+/** Sets the glViewport*/
+-(void) setViewport;
+
 /** converts a UIKit coordinate to an OpenGL coordinate
- Useful to convert (multi) touchs coordinates to the current layout (portrait or landscape)
+ Useful to convert (multi) touch coordinates to the current layout (portrait or landscape)
  */
 -(CGPoint) convertToGL: (CGPoint) p;
 /** converts an OpenGL coordinate to a UIKit coordinate
@@ -241,7 +260,7 @@ and when to execute the Scenes.
 
 #pragma mark Director - Scene Management
 
-/**Enters the Director's main loop with the given Scene.
+/** Enters the Director's main loop with the given Scene.
  * Call it to run only your FIRST scene.
  * Don't call it if there is already a running scene.
  *
@@ -249,77 +268,72 @@ and when to execute the Scenes.
  */
 - (void) runWithScene:(CCScene*) scene;
 
-/**Suspends the execution of the running scene, pushing it on the stack of suspended scenes.
+/** Suspends the execution of the running scene, pushing it on the stack of suspended scenes.
  * The new scene will be executed.
  * Try to avoid big stacks of pushed scenes to reduce memory allocation.
  * ONLY call it if there is a running scene.
  */
 - (void) pushScene:(CCScene*) scene;
 
-/**Suspends the execution of the running scene, pushing it on the stack of suspended scenes.
- * The new scene will be executed and is going to be presented using a scene transition effect.
- * Try to avoid big stacks of pushed scenes to reduce memory allocation.
- * ONLY call it if there is a running scene.
- */
--(void) pushScene:(CCScene*) scene withTransition:(NSString*)transitionName duration:(ccTime)t;
-
-/**Suspends the execution of the running scene, pushing it on the stack of suspended scenes.
- * The new scene will be executed and is going to be presented using a scene transition effect.
- * Try to avoid big stacks of pushed scenes to reduce memory allocation.
- * ONLY call it if there is a running scene.
- */
--(void) pushScene:(CCScene*) scene withTransition:(NSString*)transitionName duration:(ccTime)t
-                     withColor:(ccColor3B)color;
-
-/**Suspends the execution of the running scene, pushing it on the stack of suspended scenes.
- * The new scene will be executed and is going to be presented using a scene transition effect.
- * Try to avoid big stacks of pushed scenes to reduce memory allocation.
- * ONLY call it if there is a running scene.
- */
--(void) pushScene:(CCScene*) scene withTransition:(NSString*)transitionName duration:(ccTime)t
-               withOrientation:(tOrientation)orientation;
-
-/**Pops out a scene from the queue.
+/** Pops out a scene from the queue.
  * This scene will replace the running one.
  * The running scene will be deleted. If there are no more scenes in the stack the execution is terminated.
  * ONLY call it if there is a running scene.
  */
 - (void) popScene;
 
-/**Pops out a scene from the queue.
- * This scene will replace the running one using a scene transition effect.
- * The running scene will be deleted. If there are no more scenes in the stack the execution is terminated.
- * ONLY call it if there is a running scene.
- */
--(void) popSceneWithTransition:(NSString*)transitionName duration:(ccTime)t;
-
-/**Pops out a scene from the queue.
- * This scene will replace the running one using a scene transition effect.
- * The running scene will be deleted. If there are no more scenes in the stack the execution is terminated.
- * ONLY call it if there is a running scene.
- */
--(void) popSceneWithTransition:(NSString*)transitionName duration:(ccTime)t
-                     withColor:(ccColor3B)color;
-
-/**Pops out a scene from the queue.
- * This scene will replace the running one using a scene transition effect.
- * The running scene will be deleted. If there are no more scenes in the stack the execution is terminated.
- * ONLY call it if there is a running scene.
- */
--(void) popSceneWithTransition:(NSString*)transitionName duration:(ccTime)t
-                     withOrientation:(tOrientation)orientation;
-
 /**Pops out all scenes from the queue until the root scene in the queue.
  * This scene will replace the running one.
- * The running scene will be deleted. If there are no more scenes in the stack the execution is terminated.
- * ONLY call it if there is a running scene.
+ * Internally it will call `popToSceneStackLevel:1`
  */
 - (void) popToRootScene;
+
+/** Pops out all scenes from the queue until it reaches `level`.
+ If level is 0, it will end the director.
+ If level is 1, it will pop all scenes until it reaches to root scene.
+ If level is <= than the current stack level, it won't do anything.
+ */
+-(void) popToSceneStackLevel:(NSUInteger)level;
 
 /** Replaces the running scene with a new one. The running scene is terminated.
  * ONLY call it if there is a running scene.
  */
 -(void) replaceScene: (CCScene*) scene;
+
+/**
+ *  Presents a new scene by either starting first scene, or replacing the running
+ *
+ *  @param scene The scene to present
+ *  @since v2.5
+ */
+//- (void)presentScene:(CCScene *)scene;
+
+/**
+ *  Presents a new scene by either starting first scene, or replacing the running
+ *  Performs a transition between the outgoing and the incoming scene
+ *
+ *  @param scene      The incoming scene
+ *  @param transition The transition to perform
+ *  @since v2.5
+ */
+- (void)replaceScene:(CCScene *)scene withTransition:(CCTransition *)transition;
+
+/**
+ *  Pushes the running scene onto the scene stack, and presents the incoming scene, using a transition
+ *
+ *  @param scene      The scene to present
+ *  @param transition The transition to use
+ *  @since v2.5
+ */
+- (void)pushScene:(CCScene *)scene withTransition:(CCTransition *)transition;
+
+/**
+ *  Replaces the running scene, with the last scene pushed to the stack, using a transition
+ *
+ *  @param transition The transition to use
+ *  @since v2.5
+ */
+- (void)popScenewithTransition:(CCTransition *)transition;
 
 /** Ends the execution, releases the running scene.
  It doesn't remove the OpenGL view from its parent. You have to do it manually.
@@ -328,7 +342,7 @@ and when to execute the Scenes.
 
 /** Pauses the running scene.
  The running scene will be _drawed_ but all scheduled timers will be paused
- While paused, the draw rate will be 4 FPS to reduce CPU consuption
+ While paused, the draw rate will be 4 FPS to reduce CPU consumption
  */
 -(void) pause;
 
@@ -339,13 +353,13 @@ and when to execute the Scenes.
 -(void) resume;
 
 /** Stops the animation. Nothing will be drawn. The main loop won't be triggered anymore.
- If you wan't to pause your animation call [pause] instead.
+ If you want to pause your animation call [pause] instead.
  */
 -(void) stopAnimation;
 
 /** The main loop is triggered again.
  Call this function only if [stopAnimation] was called earlier
- @warning Dont' call this function to start the main loop. To run the main loop call runWithScene
+ @warning Don't call this function to start the main loop. To run the main loop call runWithScene
  */
 -(void) startAnimation;
 

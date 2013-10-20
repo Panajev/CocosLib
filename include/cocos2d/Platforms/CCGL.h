@@ -27,15 +27,15 @@
 // Common layer for OpenGL stuff
 //
 
-#import "../ccMacros.h"
+#import "ccMacros.h"
 
-#if __CC_PLATFORM_IOS
+#if defined (__CC_PLATFORM_IOS)
 #import <OpenGLES/ES2/gl.h>
 #import <OpenGLES/ES2/glext.h>
 #import <OpenGLES/EAGL.h>
 #import "iOS/CCGLView.h"
 
-#elif __CC_PLATFORM_MAC
+#elif defined (__CC_PLATFORM_MAC)
 #import <OpenGL/gl.h>
 #import <OpenGL/glu.h>
 #import <Cocoa/Cocoa.h>	// needed for NSOpenGLView
@@ -44,18 +44,20 @@
 
 
 // iOS
-#if __CC_PLATFORM_IOS
+#if defined (__CC_PLATFORM_IOS)
 #define	glClearDepth				glClearDepthf
 #define glDeleteVertexArrays		glDeleteVertexArraysOES
 #define glGenVertexArrays			glGenVertexArraysOES
 #define glBindVertexArray			glBindVertexArrayOES
+#define glMapBuffer					glMapBufferOES
+#define glUnmapBuffer				glUnmapBufferOES
 
-#define CC_GL_DEPTH24_STENCIL8		GL_DEPTH24_STENCIL8_OES
+#define GL_DEPTH24_STENCIL8			GL_DEPTH24_STENCIL8_OES
+#define GL_WRITE_ONLY				GL_WRITE_ONLY_OES
 
 // Mac
-#elif __CC_PLATFORM_MAC
+#elif defined(__CC_PLATFORM_MAC)
 
-#define CC_GL_DEPTH24_STENCIL8		GL_DEPTH24_STENCIL8
 
 #if 1
 #define glDeleteVertexArrays		glDeleteVertexArraysAPPLE

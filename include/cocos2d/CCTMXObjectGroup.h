@@ -41,20 +41,20 @@
 */
 @interface CCTMXObjectGroup : NSObject
 {
-	NSString			*groupName_;
-	CGPoint				positionOffset_;
-	NSMutableArray		*objects_;
-	NSMutableDictionary	*properties_;
+	NSString			*_groupName;
+	CGPoint				_positionOffset;
+	NSMutableArray		*_objects;
+	NSMutableDictionary	*_properties;
 }
 
 /** name of the group */
-@property (nonatomic,readwrite,retain) NSString *groupName;
+@property (nonatomic,readwrite,strong) NSString *groupName;
 /** offset position of child objects */
 @property (nonatomic,readwrite,assign) CGPoint positionOffset;
 /** array of the objects */
-@property (nonatomic,readwrite,retain) NSMutableArray *objects;
+@property (nonatomic,readwrite,strong) NSMutableArray *objects;
 /** list of properties stored in a dictionary */
-@property (nonatomic,readwrite,retain) NSMutableDictionary *properties;
+@property (nonatomic,readwrite,strong) NSMutableDictionary *properties;
 
 /** return the value for the specific property name */
 -(id) propertyNamed:(NSString *)propertyName;

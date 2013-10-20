@@ -24,13 +24,15 @@ extern "C" {
 	/* XXX: pragma pack ??? */
 	/** @struct CCZHeader
 	 */
+#pragma clang diagnostic push COCOS2D
+#pragma clang diagnostic ignored "-Wpacked"
 	struct CCZHeader {
 		uint8_t			sig[4];				// signature. Should be 'CCZ!' 4 bytes
 		uint16_t		compression_type;	// should 0
 		uint16_t		version;			// should be 2 (although version type==1 is also supported)
-		uint32_t		reserved;			// Reserverd for users.
+		uint32_t		reserved;			// Reserved for users.
 		uint32_t		len;				// size of the uncompressed file
-	};
+	}__attribute__((packed));
 
 	enum {
 		CCZ_COMPRESSION_ZLIB,				// zlib format.
@@ -38,6 +40,7 @@ extern "C" {
 		CCZ_COMPRESSION_GZIP,				// gzip format (not supported yet)
 		CCZ_COMPRESSION_NONE,				// plain (not supported yet)
 	};
+#pragma clang diagnostic pop COCOS2D
 
 /** @file
  * Zip helper functions
@@ -47,7 +50,7 @@ extern "C" {
  * Inflates either zlib or gzip deflated memory. The inflated memory is
  * expected to be freed by the caller.
  *
- * It will allocate 256k for the destination buffer. If it is not enought it will multiply the previous buffer size per 2, until there is enough memory.
+ * It will allocate 256k for the destination buffer. If it is not enough it will multiply the previous buffer size per 2, until there is enough memory.
  * @returns the length of the deflated buffer
  *
  @since v0.8.1
@@ -58,13 +61,13 @@ int ccInflateMemory(unsigned char *in, unsigned int inLength, unsigned char **ou
  * Inflates either zlib or gzip deflated memory. The inflated memory is
  * expected to be freed by the caller.
  *
- * outLenghtHint is assumed to be the needed room to allocate the inflated buffer.
+ * outlengthHint is assumed to be the needed room to allocate the inflated buffer.
  *
  * @returns the length of the deflated buffer
  *
  @since v1.0.0
  */
-int ccInflateMemoryWithHint(unsigned char *in, unsigned int inLength, unsigned char **out, unsigned int outLenghtHint );
+int ccInflateMemoryWithHint(unsigned char *in, unsigned int inLength, unsigned char **out, unsigned int outlengthHint );
 
 
 /** inflates a GZip file into memory

@@ -77,7 +77,7 @@ typedef struct _FontDefHashElement
 	NSUInteger		key;		// key. Font Unicode value
 	ccBMFontDef		fontDef;	// font definition
 	UT_hash_handle	hh;
-} tFontDefHashElement;
+} tCCFontDefHashElement;
 
 // Equal function for targetSet.
 typedef struct _KerningHashElement
@@ -85,7 +85,7 @@ typedef struct _KerningHashElement
 	int				key;		// key for the hash. 16-bit for 1st element, 16-bit for 2nd element
 	int				amount;
 	UT_hash_handle	hh;
-} tKerningHashElement;
+} tCCKerningHashElement;
 #pragma mark -
 
 /** CCBMFontConfiguration has parsed configuration of the the .fnt file
@@ -93,27 +93,33 @@ typedef struct _KerningHashElement
  */
 @interface CCBMFontConfiguration : NSObject
 {
+	// Character Set defines the letters that actually exist in the font
+	NSCharacterSet *_characterSet;
+  
 	// atlas name
-	NSString		*atlasName_;
+	NSString		*_atlasName;
     
-    // XXX: Creating a public interface so that the bitmapFontArray[] is accesible
+    // XXX: Creating a public interface so that the bitmapFontArray[] is accessible
 @public
     
 	// BMFont definitions
-	tFontDefHashElement	*fontDefDictionary_;
+	tCCFontDefHashElement	*_fontDefDictionary;
     
 	// FNTConfig: Common Height. Should be signed (issue #1343)
-	NSInteger		commonHeight_;
+	NSInteger		_commonHeight;
     
 	// Padding
-	ccBMFontPadding	padding_;
+	ccBMFontPadding	_padding;
     
 	// values for kerning
-	tKerningHashElement	*kerningDictionary_;
+	tCCKerningHashElement	*_kerningDictionary;
 }
 
+// Character set
+@property (nonatomic, readonly) NSCharacterSet *characterSet;
+
 // atlasName
-@property (nonatomic, readwrite, retain) NSString *atlasName;
+@property (nonatomic, readwrite, strong) NSString *atlasName;
 
 /** allocates a CCBMFontConfiguration with a FNT file */
 +(id) configurationWithFNTFile:(NSString*)FNTfile;
@@ -156,27 +162,31 @@ typedef struct _KerningHashElement
 @interface CCLabelBMFont : CCSpriteBatchNode <CCLabelProtocol, CCRGBAProtocol>
 {
 	// string to render
-	NSString		*string_;
+	NSString		*_string;
     
     // name of fntFile
-    NSString        *fntFile_;
+    NSString        *_fntFile;
     
     // initial string without line breaks
-    NSString *initialString_;
+    NSString *_initialString;
     // max width until a line break is added
-    float width_;
+    float _width;
     // alignment of all lines
-    CCTextAlignment alignment_;
+    CCTextAlignment _alignment;
     
-	CCBMFontConfiguration	*configuration_;
+	CCBMFontConfiguration	*_configuration;
     
 	// texture RGBA
-	GLubyte		opacity_;
-	ccColor3B	color_;
-	BOOL opacityModifyRGB_;
+	GLubyte		_displayedOpacity, _realOpacity;
+	ccColor3B	_displayedColor, _realColor;
+	BOOL		_cascadeOpacityEnabled, _cascadeColorEnabled;
+	BOOL		_opacityModifyRGB;
 	
 	// offset of the texture atlas
-	CGPoint			imageOffset_;
+	CGPoint			_imageOffset;
+	
+	// reused char
+	CCSprite		*_reusedChar;
 }
 
 /** Purges the cached data.
@@ -186,9 +196,9 @@ typedef struct _KerningHashElement
 +(void) purgeCachedData;
 
 /** alignment used for the label */
-@property (nonatomic,assign,readonly) CCTextAlignment alignment;
+@property (nonatomic,readonly) CCTextAlignment alignment;
 /** fntFile used for the font */
-@property (nonatomic,retain) NSString* fntFile;
+@property (nonatomic,strong) NSString* fntFile;
 /** conforms to CCRGBAProtocol protocol */
 @property (nonatomic,readwrite) GLubyte opacity;
 /** conforms to CCRGBAProtocol protocol */
@@ -199,7 +209,7 @@ typedef struct _KerningHashElement
 +(id) labelWithString:(NSString*)string fntFile:(NSString*)fntFile;
 /** creates a BMFont label with an initial string, the FNT file, width, and alignment option */
 +(id) labelWithString:(NSString*)string fntFile:(NSString*)fntFile width:(float)width alignment:(CCTextAlignment)alignment;
-/** creates a BMFont label with an initial string, the FNT file, width, alignment option and the offset of where the glpyhs start on the .PNG image */
+/** creates a BMFont label with an initial string, the FNT file, width, alignment option and the offset of where the glyphs start on the .PNG image */
 +(id) labelWithString:(NSString*)string fntFile:(NSString*)fntFile width:(float)width alignment:(CCTextAlignment)alignment imageOffset:(CGPoint)offset;
 
 /** init a BMFont label with an initial string and the FNT file */

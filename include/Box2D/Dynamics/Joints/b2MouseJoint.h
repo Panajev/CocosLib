@@ -92,9 +92,6 @@ public:
 	/// The mouse joint does not support dumping.
 	void Dump() { b2Log("Mouse joint dumping is not supported.\n"); }
 
-	/// Implement b2Joint::ShiftOrigin
-	void ShiftOrigin(const b2Vec2& newOrigin);
-
 protected:
 	friend class b2Joint;
 
@@ -109,7 +106,7 @@ protected:
 	float32 m_frequencyHz;
 	float32 m_dampingRatio;
 	float32 m_beta;
-	
+
 	// Solver shared
 	b2Vec2 m_impulse;
 	float32 m_maxForce;

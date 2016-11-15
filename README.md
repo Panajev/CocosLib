@@ -8,41 +8,22 @@ General Notes
 
 Current patches applied and changes from Cocos2D's master-v2 branch (20120820).
 
-1.) PVRv3 format support from develop-v2.
-
-2.) Removed some font related forward declarations (merged in develop-v2 check if this has already been brought in master-v2)… tFontDefHashElement and KerningHashElement… 
-
-https://github.com/cocos2d/cocos2d-iphone/commit/89244ec00d85245dcc074d8aade573c610fbab47
-
-3.) Support for animated transitions when pushing or popping scenes:
+1.) Support for animated transitions when pushing or popping scenes:
 https://github.com/cocos2d/cocos2d-iphone/pull/230
 
-4.) Optimisation - eliminated costly [NSNumber floatValue] calls
-https://github.com/cocos2d/cocos2d-iphone/pull/232
+//MAYBE NOT... USE the new feature in Cocos2D // 5.) Rendering Target Node - Rendering to texture made simpler.
+//https://github.com/cocos2d/cocos2d-iphone/pull/231
 
-5.) CCGLProgram guards, fixes and debugging info
-https://github.com/cocos2d/cocos2d-iphone/pull/212
-
-	Added some further fixes: 
-		https://github.com/iomac/cocos2d-iphone/commit/c3f1ffb2a47402acf351da6fff33e8cf83fe0258#commitcomment-1737403
-		https://github.com/Panajev/CocosLib/commit/f978aa38b5b4a50797cc856a1a67f391589b9cf3 
-
-6.) Rendering Target Node - Rendering to texture made simpler.
-https://github.com/cocos2d/cocos2d-iphone/pull/231
-
-7.) Fix for issue #1398: Double firing of CCCallBlock in CCSequence.
+2.) Fix for issue #1398: Double firing of CCCallBlock in CCSequence.
 https://github.com/cocos2d/cocos2d-iphone/pull/233
 
-8.) Fixed CCSprite's displayFrame function not returning the correct frame in Retina mode (taken from develop-v2).
+3.) Fixed CCSprite's displayFrame function not returning the correct frame in Retina mode (taken from develop-v2).
     https://github.com/cocos2d/cocos2d-iphone/commit/ec7cc1c7437dc4a590de7b8103504d4aa00b4503
 
-9.) Added the ability to turn off debug drawing for a CCSprite node or any of its subclasses at runtime.
+4.) Added the ability to turn off debug drawing for a CCSprite node or any of its subclasses at runtime.
     https://github.com/cocos2d/cocos2d-iphone/pull/234
     
-10.) Fixed issue with CCRenderTexture causing the wrong viewport and view matrix to be restored when used inside a custom draw/visit method.
-    https://github.com/cocos2d/cocos2d-iphone/pull/238
-    
-11.) Fixed an issue with the results of the ccpAngle method (slightly slower perhaps, but this should be more accurate):
+5.) Fixed an issue with the results of the ccpAngle method (slightly slower perhaps, but this should be more accurate):
     https://github.com/cocos2d/cocos2d-iphone/pull/213
 
 HOWTO Install
